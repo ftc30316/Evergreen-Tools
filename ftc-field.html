@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FTC Field Coordinate Helper</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+    }
+
+    .container {
+      display: flex;
+      height: 100vh;
+      box-sizing: border-box;
+    }
+
+    .left-panel {
+      flex: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 10px;
+      box-sizing: border-box;
+      background: #ffffff;
+      border-right: 1px solid #ccc;
+    }
+
+    .right-panel {
+      flex: 1;
+      padding: 10px;
+      box-sizing: border-box;
+      background: #fafafa;
+      overflow-y: auto;
+    }
+
+    h1 {
+      font-size: 20px;
+      margin: 5px 0 10px 0;
+      text-align: center;
+    }
+
+    .top-controls {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 6px;
+      gap: 8px;
+    }
+
+    .top-controls label {
+      font-size: 14px;
+    }
+
+    .top-controls select {
+      font-size: 14px;
+      padding: 2px 6px;
+    }
+
+    #field-container {
+      position: relative;
+      max-width: 100%;
+      max-height: calc(100vh - 120px);
+      overflow: auto;
+      border: 1px solid #ccc;
+      background: #eee;
+    }
+
+    #field-image {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      cursor: crosshair;
+    }
+
+    /* SVG overlay for lines / arc / labels */
+    #field-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none; /* let mouse events go through to the image */
+      z-index: 5;
+    }
+
+    #coord-display {
+      margin-top: 8px;
+      font-size: 14px;
+      padding: 4px 8px;
+      background: #222;
+      color: #fff;
+      border-radius: 4px;
+      display: inline-block;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 4px 6px;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    th {
+      background: #e0e0e0;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    .table-title {
+      font-size: 16px;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+
+    .small-note {
+      font-size: 12px;
+      color: #555;
+      margin-bottom: 8px;
+    }
+
+    /* Bottom-right informational box */
+    .info-box {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.8);
+      color: #fff;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      max-width: 260px;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+      z-index: 1000;
+    }
+
+    .info-box h2 {
+      font-size: 13px;
+      margin: 0 0 6px 0;
+      text-align: left;
+    }
+
+    .info-box ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .info-box li {
+      margin-bottom: 3px;
+    }
+
+    /* Click markers on the field */
+    .marker {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: cyan;          /* Fill color */
+      border: 2px solid #000;    /* Black stroke */
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.6);
+      transform: translate(-50%, -50%);
+      z-index: 10;
+    }
+
+    .marker-label {
+      position: absolute;
+      left: 10px;
+      top: -4px;
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      padding: 2px 4px;
+      font-size: 10px;
+      white-space: nowrap;
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Left: controls, field image & live coordinate display -->
+    <div class="left-panel">
+      <div class="top-controls">
+        <label for="theme-select">Field Theme:</label>
+        <select id="theme-select">
+          <option value="dark" selected>Dark</option>
+          <option value="gray">Gray</option>
+          <option value="light">Light</option>
+        </select>
+      </div>
+      <h1>FTC Field Coordinate Viewer</h1>
+      <div id="field-container">
+        <!-- Default: Dark field -->
+        <img id="field-image" src="ftc-field-dark.png" alt="FTC Field" />
+        <!-- SVG overlay for lines / angle arc / labels -->
+        <svg id="field-overlay"></svg>
+      </div>
+      <div id="coord-display">Move mouse over field...</div>
+    </div>
+
+    <!-- Right: click log table -->
+    <div class="right-panel">
+      <div class="table-title">Click Log</div>
+      <div class="small-note">
+        Each click on the field is recorded here with its coordinate (in inches) and angle (degrees).
+      </div>
+      <table id="click-log">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>X (in)</th>
+            <th>Y (in)</th>
+            <th>Angle (°)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Rows will be added here by JavaScript -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Bottom-right info box -->
+  <div class="info-box">
+    <h2>Field Coordinate Notes</h2>
+    <ul>
+      <li>Heading 0° is in the +X direction.</li>
+      <li>Counterclockwise rotation is positive (+).</li>
+      <li>Clockwise rotation is negative (−).</li>
+    </ul>
+  </div>
+
+  <script>
+    (function () {
+      const fieldImage = document.getElementById("field-image");
+      const fieldContainer = document.getElementById("field-container");
+      const coordDisplay = document.getElementById("coord-display");
+      const clickLogBody = document.querySelector("#click-log tbody");
+      const themeSelect = document.getElementById("theme-select");
+      const fieldOverlay = document.getElementById("field-overlay");
+
+      let clickCount = 0;
+
+      // Map theme selection to image file names
+      function updateFieldTheme(theme) {
+        switch (theme) {
+          case "light":
+            fieldImage.src = "ftc-field-light.png";
+            break;
+          case "dark":
+            fieldImage.src = "ftc-field-dark.png";
+            break;
+          case "gray":
+          default:
+            fieldImage.src = "ftc-field-gray.png";
+            break;
+        }
+      }
+
+      // Listen for theme changes
+      themeSelect.addEventListener("change", function () {
+        updateFieldTheme(this.value);
+      });
+
+      // Convert mouse position (relative to image) into snapped field coordinates and angle
+      function getFieldCoordsAndAngle(event) {
+        const rect = fieldImage.getBoundingClientRect();
+
+        // Mouse position relative to the image
+        const relX = event.clientX - rect.left;
+        const relY = event.clientY - rect.top;
+
+        const width = rect.width;
+        const height = rect.height;
+
+        // Center of the image
+        const centerX = width / 2;
+        const centerY = height / 2;
+
+        // Raw inches before snapping
+        const rawXInches = ((relX - centerX) / centerX) * 72;
+        const rawYInches = ((centerY - relY) / centerY) * 72; // y up
+
+        const clamp = (v, min, max) => Math.min(Math.max(v, min), max);
+
+        // Clamp to field range
+        const clampedX = clamp(rawXInches, -72, 72);
+        const clampedY = clamp(rawYInches, -72, 72);
+
+        // Snap to nearest 1" increment
+        const x = Math.round(clampedX);
+        const y = Math.round(clampedY);
+
+        // Compute angle from +X axis to (x, y)
+        const angleRad = Math.atan2(y, x);
+        const angleDeg = angleRad * (180 / Math.PI);
+
+        return {
+          x,
+          y,
+          angleDeg,
+          angleRad
+        };
+      }
+
+      // Convert snapped inches to overlay geometry (pixels)
+      function getOverlayGeometry(xInches, yInches) {
+        const containerRect = fieldContainer.getBoundingClientRect();
+        const imgRect = fieldImage.getBoundingClientRect();
+
+        const width = imgRect.width;
+        const height = imgRect.height;
+
+        const centerXImg = width / 2;
+        const centerYImg = height / 2;
+
+        const pixelsPerInchX = centerXImg / 72;
+        const pixelsPerInchY = centerYImg / 72;
+
+        // Position of snapped point relative to image
+        const relX = centerXImg + xInches * pixelsPerInchX;
+        const relY = centerYImg - yInches * pixelsPerInchY;
+
+        // Convert to container (overlay) coordinates
+        const offsetLeft = imgRect.left - containerRect.left;
+        const offsetTop = imgRect.top - containerRect.top;
+
+        const endX = offsetLeft + relX;
+        const endY = offsetTop + relY;
+
+        const centerX = offsetLeft + centerXImg;
+        const centerY = offsetTop + centerYImg;
+
+        return {
+          endX,
+          endY,
+          centerX,
+          centerY,
+          imgWidth: width,
+          imgHeight: height
+        };
+      }
+
+      // Render line, arc, and labels on the SVG overlay using snapped inches
+      function renderOverlay(data) {
+        const geom = getOverlayGeometry(data.x, data.y);
+        const mouseX = geom.endX;
+        const mouseY = geom.endY;
+        const centerX = geom.centerX;
+        const centerY = geom.centerY;
+
+        // Clear previous overlay graphics
+        fieldOverlay.innerHTML = "";
+
+        // ----- Line from center to snapped point -----
+        const lineBlack = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        lineBlack.setAttribute("x1", centerX);
+        lineBlack.setAttribute("y1", centerY);
+        lineBlack.setAttribute("x2", mouseX);
+        lineBlack.setAttribute("y2", mouseY);
+        lineBlack.setAttribute("stroke", "black");
+        lineBlack.setAttribute("stroke-width", "4");
+        lineBlack.setAttribute("stroke-linecap", "round");
+
+        const lineCyan = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        lineCyan.setAttribute("x1", centerX);
+        lineCyan.setAttribute("y1", centerY);
+        lineCyan.setAttribute("x2", mouseX);
+        lineCyan.setAttribute("y2", mouseY);
+        lineCyan.setAttribute("stroke", "cyan");
+        lineCyan.setAttribute("stroke-width", "2");
+        lineCyan.setAttribute("stroke-linecap", "round");
+
+        fieldOverlay.appendChild(lineBlack);
+        fieldOverlay.appendChild(lineCyan);
+
+        // ----- Coordinate label near snapped point -----
+        const coordText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        coordText.setAttribute("x", mouseX + 10);
+        coordText.setAttribute("y", mouseY - 10);
+        coordText.setAttribute("fill", "black");
+        coordText.setAttribute("stroke", "white");
+        coordText.setAttribute("stroke-width", "0.5");
+        coordText.setAttribute("font-size", "11");
+        coordText.setAttribute("font-family", "Arial, sans-serif");
+        coordText.textContent =
+          "(" + data.x.toFixed(0) + ", " + data.y.toFixed(0) + ")";
+
+        fieldOverlay.appendChild(coordText);
+
+        // ----- Angle arc from +X axis to line -----
+        const angleRad = data.angleRad;
+
+        // Choose a reasonable radius for the arc in screen pixels
+        const imgSize = Math.min(geom.imgWidth, geom.imgHeight);
+        const radius = imgSize * 0.15; // 15% of min dimension
+
+        const startX = centerX + radius; // +X direction
+        const startY = centerY;
+
+        const endXArc = centerX + radius * Math.cos(angleRad);
+        const endYArc = centerY - radius * Math.sin(angleRad); // minus because SVG y grows downward
+
+        // Always use the smaller (shortest) arc
+        const largeArcFlag = 0;
+        // Sweep direction: choose based on sign of the angle
+        const sweepFlag = angleRad >= 0 ? 0 : 1;
+
+        const arcPathBlack = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        const d = [
+          "M", startX, startY,
+          "A", radius, radius, 0, largeArcFlag, sweepFlag, endXArc, endYArc
+        ].join(" ");
+
+        arcPathBlack.setAttribute("d", d);
+        arcPathBlack.setAttribute("stroke", "black");
+        arcPathBlack.setAttribute("stroke-width", "4");
+        arcPathBlack.setAttribute("fill", "none");
+
+        const arcPathCyan = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        arcPathCyan.setAttribute("d", d);
+        arcPathCyan.setAttribute("stroke", "cyan");
+        arcPathCyan.setAttribute("stroke-width", "2");
+        arcPathCyan.setAttribute("fill", "none");
+
+        fieldOverlay.appendChild(arcPathBlack);
+        fieldOverlay.appendChild(arcPathCyan);
+
+        // ----- Angle label near the arc -----
+        const midAngle = angleRad / 2;
+        const labelRadius = radius + 16;
+        const labelX = centerX + labelRadius * Math.cos(midAngle);
+        const labelY = centerY - labelRadius * Math.sin(midAngle);
+
+        const angleText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        angleText.setAttribute("x", labelX);
+        angleText.setAttribute("y", labelY);
+        angleText.setAttribute("fill", "black");
+        angleText.setAttribute("stroke", "white");
+        angleText.setAttribute("stroke-width", "0.5");
+        angleText.setAttribute("font-size", "11");
+        angleText.setAttribute("font-family", "Arial, sans-serif");
+        angleText.setAttribute("text-anchor", "middle");
+        angleText.setAttribute("alignment-baseline", "middle");
+        angleText.textContent = data.angleDeg.toFixed(1) + "°";
+
+        fieldOverlay.appendChild(angleText);
+      }
+
+      // Update coordinate + angle display and overlay on mouse move (snapped to inches)
+      fieldImage.addEventListener("mousemove", function (event) {
+        const data = getFieldCoordsAndAngle(event);
+
+        coordDisplay.textContent =
+          "X: " + data.x.toFixed(0) +
+          " in, Y: " + data.y.toFixed(0) +
+          " in, Angle: " + data.angleDeg.toFixed(2) + "°";
+
+        renderOverlay(data);
+      });
+
+      // Reset display and clear overlay when mouse leaves image
+      fieldImage.addEventListener("mouseleave", function () {
+        coordDisplay.textContent = "Move mouse over field...";
+        fieldOverlay.innerHTML = "";
+      });
+
+      // Log clicks in the table (including angle), add a marker at snapped position, and show overlay
+      fieldImage.addEventListener("click", function (event) {
+        const data = getFieldCoordsAndAngle(event);
+        clickCount++;
+
+        // 1) Add row to table
+        const row = document.createElement("tr");
+
+        const cellIndex = document.createElement("td");
+        const cellX = document.createElement("td");
+        const cellY = document.createElement("td");
+        const cellAngle = document.createElement("td");
+
+        cellIndex.textContent = clickCount;
+        cellX.textContent = data.x.toFixed(0);
+        cellY.textContent = data.y.toFixed(0);
+        cellAngle.textContent = data.angleDeg.toFixed(2);
+
+        row.appendChild(cellIndex);
+        row.appendChild(cellX);
+        row.appendChild(cellY);
+        row.appendChild(cellAngle);
+
+        clickLogBody.appendChild(row);
+
+        // 2) Add marker dot and label at snapped coordinate
+        const geom = getOverlayGeometry(data.x, data.y);
+
+        const marker = document.createElement("div");
+        marker.className = "marker";
+        marker.style.left = geom.endX + "px";
+        marker.style.top = geom.endY + "px";
+
+        const label = document.createElement("div");
+        label.className = "marker-label";
+        label.textContent =
+          "(" + data.x.toFixed(0) +
+          ", " + data.y.toFixed(0) +
+          ") @ " + data.angleDeg.toFixed(1) + "°";
+
+        marker.appendChild(label);
+        fieldContainer.appendChild(marker);
+
+        // 3) Render overlay for the snapped point
+        renderOverlay(data);
+      });
+
+      // Ensure default theme (matches initial select value)
+      updateFieldTheme(themeSelect.value);
+    })();
+  </script>
+</body>
+</html>
