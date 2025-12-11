@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Evergreen Dynamics – FTC Judge Q&A Practice</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #f5f7fa;
+      --card-bg: #ffffff;
+      --accent: #0c6b3c;
+      --accent-light: #e0f3e9;
+      --text: #1f2933;
+      --muted: #6b7280;
+      --border: #d1d5db;
+      --shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: radial-gradient(circle at top left, #e4f2ff 0, #f5f7fa 55%);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .page {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 24px 16px 48px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: clamp(1.9rem, 3vw, 2.4rem);
+      font-weight: 800;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    header h2 {
+      margin: 6px 0 0;
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    header p {
+      margin: 10px auto 0;
+      max-width: 620px;
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+
+    .pill-row {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .pill {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--accent-light);
+      color: var(--accent);
+      border: 1px solid rgba(12, 107, 60, 0.25);
+    }
+
+    .note {
+      max-width: 750px;
+      margin: 0.75rem auto 1.5rem;
+      padding: 10px 12px;
+      border-left: 3px solid var(--accent);
+      background: rgba(255, 255, 255, 0.7);
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .toc {
+      max-width: 820px;
+      margin: 0 auto 24px;
+      padding: 14px 16px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+    }
+
+    .toc h3 {
+      margin: 0 0 6px;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--muted);
+    }
+
+    .toc-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 14px;
+      list-style: none;
+      padding: 0;
+      margin: 6px 0 0;
+      font-size: 0.9rem;
+    }
+
+    .toc-list a {
+      text-decoration: none;
+      color: var(--accent);
+      position: relative;
+    }
+
+    .toc-list a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -2px;
+      width: 0;
+      height: 2px;
+      background: var(--accent);
+      transition: width 0.18s ease-out;
+    }
+
+    .toc-list a:hover::after {
+      width: 100%;
+    }
+
+    .sections {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      margin-top: 10px;
+    }
+
+    details.section {
+      background: var(--card-bg);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      padding: 0;
+      overflow: hidden;
+    }
+
+    details.section[open] {
+      border-color: rgba(12, 107, 60, 0.55);
+      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12);
+    }
+
+    details.section summary {
+      cursor: pointer;
+      list-style: none;
+      padding: 14px 16px 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(
+        135deg,
+        rgba(12, 107, 60, 0.06),
+        rgba(12, 107, 60, 0)
+      );
+    }
+
+    details.section summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .chevron {
+      width: 16px;
+      height: 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(12, 107, 60, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: var(--accent);
+      flex-shrink: 0;
+      background: #ffffff;
+    }
+
+    details[open] .chevron {
+      transform: rotate(90deg);
+    }
+
+    .section-title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .section-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .section-subtitle {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .badge-row {
+      margin-left: auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .badge {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(107, 114, 128, 0.6);
+      color: var(--muted);
+      background: #ffffff;
+      white-space: nowrap;
+    }
+
+    .section-body {
+      padding: 10px 18px 16px;
+      border-top: 1px solid rgba(209, 213, 219, 0.7);
+      background: radial-gradient(
+          circle at top right,
+          rgba(12, 107, 60, 0.03),
+          transparent 60%
+        ),
+        #ffffff;
+    }
+
+    h3.topic {
+      margin: 12px 0 4px;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--muted);
+    }
+
+    ul.questions {
+      margin: 4px 0 0 1.2rem;
+      padding: 0;
+      font-size: 0.95rem;
+    }
+
+    ul.questions li {
+      margin-bottom: 4px;
+    }
+
+    .footer-note {
+      margin-top: 30px;
+      font-size: 0.85rem;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    @media (min-width: 768px) {
+      .page {
+        padding: 32px 16px 56px;
+      }
+      .section-body {
+        padding: 12px 22px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <h1>Evergreen Dynamics</h1>
+      <h2>FTC 30316 &mdash; Judge Q&amp;A Practice Guide</h2>
+      <p>
+        Use these questions to practice for your 5-minute Q&amp;A with judges
+        and for pit visits at qualifier events. Focus on clear, confident,
+        student-led answers.
+      </p>
+      <div class="pill-row">
+        <span class="pill">Rookie Season</span>
+        <span class="pill">Decode</span>
+        <span class="pill">FTC Judging Prep</span>
+      </div>
+    </header>
+
+    <div class="note">
+      <strong>How to use this page:</strong> Click a section to expand it. Pick
+      a category, have someone act as a judge, and practice answering out loud.
+      Rotate who answers first so the whole team gets reps.
+    </div>
+
+    <section class="toc">
+      <h3>Sections on this page</h3>
+      <ul class="toc-list">
+        <li><a href="#team-identity">Team Identity &amp; Roles</a></li>
+        <li><a href="#robot-hardware">Robot Hardware Design</a></li>
+        <li><a href="#software-control">Software &amp; Control</a></li>
+        <li><a href="#strategy">Game Strategy &amp; Match Planning</a></li>
+        <li><a href="#portfolio">Engineering Portfolio</a></li>
+        <li><a href="#innovation">Innovation &amp; Creativity</a></li>
+        <li><a href="#teamwork">Teamwork &amp; GP</a></li>
+        <li><a href="#outreach">Outreach &amp; Community Impact</a></li>
+        <li><a href="#pit">Pit Visit Rapid-Fire</a></li>
+        <li><a href="#rookie">Rookie Team Questions</a></li>
+      </ul>
+    </section>
+
+    <div class="sections">
+      <!-- 1. Team Identity & Roles -->
+      <details class="section" open id="team-identity">
+        <summary>
+          <div class="chevron">&#9654;</div>
+          <div class="section-title-block">
+            <div class="section-title">1. Team Identity &amp; Roles</div>
+            <div class="section-subtitle">
+              Who you are, what you do, and how you work together.
+            </div>
+          </div>
+          <div class="badge-row">
+            <span class="badge">Inspire</span>
+            <span class="badge">Team Culture</span>
+          </div>
+        </summary>
+        <div class="section-body">
+          <h3 class="topic">Team Story &amp; Roles</h3>
+          <ul class="questions">
+            <li>What makes your team unique this season?</li>
+            <li>How did each team member contribute to the robot, portfolio, and outreach?</li>
+            <li>What new skills did you personally learn this year?</li>
+            <li>How do you resolve disagreements on your team?</li>
+            <li>Tell us about a moment this year when someone stepped up as a leader.</li>
+          </ul>
+
+          <h3 class="topic">Team Processes</h3>
+          <ul class="questions">
+            <li>How do you organize meetings and decide who works on what?</li>
+            <li>What is your engineering process from idea → prototype → test → final?</li>
+            <li>What tools do you use to stay organized (code repos, notes, schedules, etc.)?</li>
+          </ul>
+        </div>
+      </details>
+
+      <!-- 2. Robot Hardware Design -->
+      <details class="section" id="robot-hardware">
+        <summary>
+          <div class="chevron">&#9654;</div>
+          <div class="section-title-block">
+            <div class="section-title">2. Robot Hardware Design</div>
+            <div class="section-subtitle">
+              Mechanisms, durability, tradeoffs, and testing.
+            </div>
+          </div>
+          <div class="badge-row">
+            <span class="badge">Design Award</span>
+            <span class="badge">Build Quality</span>
+          </div>
+        </summary>
+        <div class="section-body">
+          <h3 class="topic">Conceptual Design</h3>
+          <ul class="questions">
+            <li>What were your most important design goals for the robot?</li>
+            <li>Why did you choose your drivetrain, and what alternatives did you consider?</li>
+            <li>What trade-offs did you consider when designing your intake or scoring mechanism?</li>
+            <li>Explain how your robot achieves consistency when scoring artifacts.</li>
+          </ul>
+
+          <h3 class="topic">Mechanisms &amp; Materials</h3>
+          <ul class="questions">
+            <li>Walk us through your intake system. What problems did earlier versions have?</li>
+            <li>Where did you use 3D-printed parts, and why were prints better than off-the-shelf parts?</li>
+            <li>What design decisions improved durability of your robot?</li>
+            <li>What is the “weakest link” of your robot mechanically, and how do you plan to improve it?</li>
+          </ul>
+
+          <h3 class="topic">Reliability &amp; Testing</h3>
+          <ul class="questions">
+            <li>How do you test your mechanisms for repeatability?</li>
+            <li>What failures have you experienced, and what did you learn from them?</li>
+            <li>How easy is your robot to repair during a match timeout?</li>
+          </ul>
+        </div>
+      </details>
+
+      <!-- 3. Software & Control -->
+      <details class="section" id="software-control">
+        <summary>
+          <div class="chevron">&#9654;</div>
+          <div class="section-title-block">
+            <div class="section-title">3. Software, Programming &amp; Control</div>
+            <div class="section-subtitle">
+              Code structure, sensors, autonomy, and debugging.
+            </div>
+          </div>
+          <div class="badge-row">
+            <span class="badge">Control Award</span>
+            <span class="badge">Autonomous</span>
+          </div>
+        </summary>
+        <div class="section-body">
+          <h3 class="topic">Programming Fundamentals</h3>
+          <ul class="questions">
+            <li>What is the most complex piece of code on your robot?</li>
+            <li>How do you structure your code to keep it organized and maintainable?</li>
+            <li>How are you using motion planning or Road Runner this season? What was hardest to tune?</li>
+          </ul>
+
+          <h3 class="topic">Control Systems &amp; Sensors</h3>
+          <ul class="questions">
+            <li>What sensors do you use on your robot and why?</li>
+            <li>How does sensor data improve your robot’s performance?</li>
+            <li>How does your robot decide when to intake and when to stop?</li>
+          </ul>
+
+          <h3 class="topic">Autonomous</h3>
+          <ul class="questions">
+            <li>What is your autonomous strategy for this game?</li>
+            <li>How do you ensure your autonomous starts from a known pose or position?</li>
+            <li>What testing methods or data collection helped improve your auto?</li>
+          </ul>
+
+          <h3 class="topic">Error Handling &amp; Debugging</h3>
+          <ul class="questions">
+            <li>What is the biggest software bug you solved this season?</li>
+            <li>How do you test code changes safely before a competition?</li>
+            <li>What telemetry or logs do you rely on when debugging issues?</li>
+          </ul>
+        </div>
+      </details>
+
+      <!-- 4. Game Strategy & Match Planning -->
+      <details class="section" id="strategy">
+        <summary>
+          <div class="chevron">&#9654;</div>
+          <div class="section-title-block">
+            <div class="section-title">4. Game Strategy &amp; Match Planning</div>
+            <div class="section-subtitle">
+              How you play the DECODE game with partners and within the rules.
+            </div>
+          </div>
+          <div class="badge-row">
+            <span class="badge">Strategy</span>
+            <span class="badge">Rules</span>
+          </div>
+        </summary>
+        <div class="section-body">
+          <h3 class="topic">Season Strategy</h3>
+          <ul class="questions">
+            <li>What is your overarching match strategy for this season’s game?</li>
+            <li>How did you decide what your robot <em>should</em> do versus what it <em>could</em> do?</li>
+            <li>What do you prioritize in the first 30 seconds of TeleOp?</li>
+            <li>What is your contingency plan if the intake breaks in a match?</li>
+          </ul>
+
+          <h3 class="topic">Alliance Collaboration</h3>
+          <ul class="questions">
+            <li>How do you communicate with alliance partners before a match?</li>
+            <li>What do you discuss in the 5-minute pre-match strategy talk?</li>
+            <li>How does your robot complement other robots on a typical alliance?</li>
+          </ul>
+
+          <h3 class="topic">Rules Knowledge</h3>
+          <ul class="questions">
+            <li>Which rules had the biggest impact on your robot design choices?</li>
+            <li>What fouls do you think are easiest to accidentally incur this year?</li>
+            <li>How do you avoid causing major penalties during defense or navigation?</li>
+          </ul>
+        </div>
+      </details>
+
+      <!-- 5. Engineering Portfolio -->
+      <details class="section" id="portfolio">
+        <summary>
+          <div class="chevron">&#9654;</div>
+          <div class="section-title-block">
+            <div class="section-title">5. Engineering Portfolio &amp; Documentation</div>
+            <div class="section-subtitle">
+              How you show your work, iterations, and decisions.
+            </div>
+          </div>
+          <div class="badge-row">
+            <span class="badge">Portfolio</span>
+            <span class="badge">Design Process</span>
+          </div>
+        </summary>
+        <div class="section-body">
+          <h3 class="topic">Portfolio Content</h3>
+          <ul class="questions">
+            <li>What would you say is the strongest section of your portfolio?</li>
+            <li>How does your portfolio reflect your overall design process?</li>
+            <li>Which diagrams or tables best show your engineering thinking?</li>
+          </ul>
+
+          <h3 class="topic">Iteration Evidence</h3>
+          <ul class="questions">
+            <li>Give an example of a design that changed significantly after testing.</li>
+            <li>How do you document failures and what you learned from them?</li>
+            <li>How did your portfolio evolve from early season to now?</li>
+          </ul>
+        </div>
+      </details>
+
+      <!-- 6. Innovation & Creativity -->
+      <details class="section" id="innovation">
+        <summary>
+          <div class="chevron">&#9654;</div>
+          <div class="section-title-block">
+            <div class="section-title">6. Innovation &amp; Creativity</div>
+            <div class="section-subtitle">
+              Unique ideas, clever solutions, and experimentation.
+            </div>
+          </div>
+          <div class="badge-row">
+            <span class="badge">Innovate Award</span>
+            <span class="badge">Creative Design</span>
+          </div>
+        </summary>
+        <div class="section-body">
+          <h3 class="topic">Innovation Decisions</h3>
+          <ul class="questions">
+            <li>What is the most innovative part of your robot this season?</li>
+            <li>What alternative solutions did you explore before choosing your current design?</li>
+            <li>What did you do this year that no other rookie team is likely doing?</li>
+          </ul>
+
+          <h3 class="topic">Problem Solving</h3>
+          <ul class="questions">
+            <li>Tell us about a problem that required a creative, non-obvious solution.</li>
+            <li>How do you brainstorm as a team when you get stuck?</li>
+            <li>Which prototype surprised you the most, and why?</li>
+          </ul>
+        </div>
+      </details>
+
+      <!-- 7. Team Dynamics & GP -->
+      <details class="section" id="teamwork">
+        <summary>
+          <div class="chevron">&#9654;</div>
+          <div class="section-title-block">
+            <div class="section-title">7. Team Dynamics, Communication &amp; GP</div>
+            <div class="section-subtitle">
+              How you treat each other, other teams, and your community.
+            </div>
+          </div>
+          <div class="badge-row">
+            <span class="badge">Inspire</span>
+            <span class="badge">Core Values</span>
+          </div>
+        </summary>
+        <div class="section-body">
+          <h3 class="topic">Team Culture</h3>
+          <ul class="questions">
+            <li>How do you ensure everyone has a voice on the team?</li>
+            <li>What does Gracious Professionalism mean to you in practice?</li>
+            <li>Tell us about a time you helped another team, or another team helped you.</li>
+          </ul>
+
+          <h3 class="topic">Communication</h3>
+          <ul class="questions">
+            <li>How do you communicate complex engineering ideas among students with different skill levels?</li>
+            <li>How do drivers communicate during a match?</li>
+            <li>How did you divide responsibilities when preparing your presentation?</li>
+          </ul>
+        </div>
+      </details>
+
+      <!-- 8. Outreach & Community Impact -->
+      <details class="section" id="outreach">
+        <summary>
+          <div class="chevron">&#9654;</div>
+          <div class="section-title-block">
+            <div class="section-title">8. Outreach, Community Impact &amp; Growth</div>
+            <div class="section-subtitle">
+              How you share STEM and FIRST beyond your team.
+            </div>
+          </div>
+          <div class="badge-row">
+            <span class="badge">Connect Award</span>
+            <span class="badge">Sustainability</span>
+          </div>
+        </summary>
+        <div class="section-body">
+          <h3 class="topic">Outreach Impact</h3>
+          <ul class="questions">
+            <li>What outreach did you do this season, and why does it matter?</li>
+            <li>How do you measure the impact of your outreach events?</li>
+            <li>What audiences did you target and why?</li>
+          </ul>
+
+          <h3 class="topic">Sustainability</h3>
+          <ul class="questions">
+            <li>How are you ensuring your team survives into year 2 and beyond?</li>
+            <li>How are you recruiting new team members or mentors?</li>
+            <li>What long-term partnerships are you forming with local organizations or sponsors?</li>
+          </ul>
+        </div>
+      </details>
+
+      <!-- 9. Pit Visit Questions -->
+      <details class="section" id="pit">
+        <summary>
+          <div class="chevron">&#9654;</div>
+          <div class="section-title-block">
+            <div class="section-title">9. Pit Visit Rapid-Fire Questions</div>
+            <div class="section-subtitle">
+              Short, direct questions judges might ask in the pit.
+            </div>
+          </div>
+          <div class="badge-row">
+            <span class="badge">Pit Readiness</span>
+          </div>
+        </summary>
+        <div class="section-body">
+          <h3 class="topic">Robot-Focused</h3>
+          <ul class="questions">
+            <li>Show me the part of the robot you’re most proud of.</li>
+            <li>What part of the robot would you redesign first if given one more week?</li>
+            <li>How do you maintain this mechanism between matches?</li>
+          </ul>
+
+          <h3 class="topic">Rapid Explanations</h3>
+          <ul class="questions">
+            <li>Explain your drivetrain in 20 seconds.</li>
+            <li>Explain your autonomous strategy in 15 seconds.</li>
+            <li>Explain your wiring strategy and cable management choices.</li>
+          </ul>
+        </div>
+      </details>
+
+      <!-- 10. Rookie Team-Specific Questions -->
+      <details class="section" id="rookie">
+        <summary>
+          <div class="chevron">&#9654;</div>
+          <div class="section-title-block">
+            <div class="section-title">
+              10. Rookie Team-Specific Questions
+            </div>
+            <div class="section-subtitle">
+              How you grew in your first year of FTC.
+            </div>
+          </div>
+          <div class="badge-row">
+            <span class="badge">Rookie Team</span>
+            <span class="badge">Reflection</span>
+          </div>
+        </summary>
+        <div class="section-body">
+          <h3 class="topic">Learning &amp; Growth</h3>
+          <ul class="questions">
+            <li>What was hardest about transitioning into FTC robotics?</li>
+            <li>What did you learn about hardware this year that surprised you?</li>
+            <li>What is one mistake you made early in the season that you will not repeat next year?</li>
+          </ul>
+
+          <h3 class="topic">Preparation &amp; Reflection</h3>
+          <ul class="questions">
+            <li>What does success look like for you today, as a rookie team?</li>
+            <li>How have you grown since your first meeting as Evergreen Dynamics?</li>
+            <li>What are your goals if you advance beyond this qualifier?</li>
+          </ul>
+        </div>
+      </details>
+    </div>
+
+    <div class="footer-note">
+      Tip: Practice answering out loud in complete sentences. Judges are looking
+      for <strong>student voice</strong>, clear explanations, and honest
+      reflection more than “perfect” answers.
+    </div>
+  </div>
+</body>
+</html>
