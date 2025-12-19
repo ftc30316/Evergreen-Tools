@@ -1,0 +1,232 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>How to be our alliance partner</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+
+<body>
+  <header class="hero">
+    <div class="hero-left">
+      <h1>How to be our alliance partner</h1>
+      <p class="subtitle">
+        Hi, we are <strong>Evergreen Dynamics!</strong>. This page walks you through
+        our autonomous, tele-op, and endgame strategy so we can work together efficiently.
+      </p>
+      <div class="badges">
+        <span class="badge">FTC 30316</span>
+        <span class="badge">Strategy</span>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <img class="logo" src="assets/img/logo.png" alt="Evergreen Dynamics logo" />
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- INTRO / TEAM PHOTO -->
+    <section class="card">
+      <h2>Intro</h2>
+      <div class="two-col">
+        <div>
+          <p>
+            Our goal is to make alliance collaboration easy. Below we have laid out what our robot can accomplish.
+          </p>
+        </div>
+        <div>
+          <img class="photo" src="assets/img/team-photo.jpg" alt="Team photo" />
+          <p class="caption">Team photo (update as needed)</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- AUTO -->
+    <section class="card" id="auto">
+      <h2>Autonomous</h2>
+      <p><strong>What to expect:</strong> Most of our autos focus on consistent scoring first, then positioning.</p>
+
+      <div class="callout">
+        <strong>Quick summary:</strong> Most of our autos are <strong>6 scoring</strong> (update numbers if needed).
+      </div>
+
+      <h3>MeepMeep recordings</h3>
+      <div class="video-grid">
+        <figure>
+          <video controls preload="metadata" src="C:\Users\isaac\Documents\Webpage FTC\Evergreen-Tools\strat-alliance-tool\bluelowerlowrowmeepmeep.mp4"></video>
+          <figcaption>Auto #1: 6 scoring + end position (caption)</figcaption>
+        </figure>
+
+        <figure>
+          <video controls preload="metadata" src="C:\Users\isaac\Documents\Webpage FTC\Evergreen-Tools\strat-alliance-tool\redlowershootstrafemeepmeep.mp4"></video>
+          <figcaption>Auto #2: alternate start / partner-friendly lane (caption)</figcaption>
+        </figure>
+
+        <figure>
+            <video controls preload="metadata" src="C:\Users\isaac\Documents\Webpage FTC\Evergreen-Tools\strat-alliance-tool\redupper1rowmeepmeep.mp4"></video>
+            <figcaption>Auto #1: 6 scoring + end position (caption)</figcaption>
+          </figure>
+      </div>
+    </section>
+
+    <!-- TELE-OP -->
+    <section class="card" id="teleop">
+      <h2>Tele-Op</h2>
+
+      <h3>Cycle time</h3>
+      <ul>
+        <li>We prioritize fast, repeatable cycles over risky peak scoring.</li>
+        <li>We call out cycle status: “intake”, “transferring”, “scoring”, “reset”.</li>
+      </ul>
+
+      <h3>Drive coach communication</h3>
+      <div class="callout">
+        <strong>We work best with:</strong> a <strong>human player</strong> and active partner comms
+        (simple, short callouts).
+      </div>
+
+      <ul>
+        <li>We announce path changes early (e.g., “switching to left lane”).</li>
+        <li>We confirm shared objectives (defense, lane control, endgame timing).</li>
+      </ul>
+    </section>
+
+    <!-- ENDGAME -->
+    <section class="card" id="endgame">
+      <h2>Endgame</h2>
+      <p>
+        We typically give drivers the last <strong>20 seconds</strong> to park and secure points.
+      </p>
+
+      <h3>Parking plan</h3>
+      <ul>
+        <li><strong>Full park:</strong> commit early if field traffic is high.</li>
+        <li><strong>Partial park:</strong> if we’re finishing a final cycle, we switch at ~20s.</li>
+      </ul>
+
+      <div class="callout">
+        <strong>Alliance cue:</strong> At <strong>0:25</strong> we call “endgame soon”; at <strong>0:20</strong> we commit.
+      </div>
+    </section>
+
+    <footer class="footer">
+      <p>Evergreen Dynamics — FTC 30316</p>
+    </footer>
+  </main>
+</body>
+</html>
+
+:root {
+    --bg: #0b1020;
+    --card: #111a33;
+    --text: #e9eefc;
+    --muted: #b9c4e6;
+    --accent: #7ee081;
+    --outline: rgba(255,255,255,0.10);
+  }
+  
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    background: radial-gradient(1200px 600px at 20% 0%, rgba(126,224,129,0.18), transparent),
+                radial-gradient(1000px 600px at 80% 20%, rgba(100,160,255,0.16), transparent),
+                var(--bg);
+    color: var(--text);
+  }
+  
+  .container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+  
+  .hero {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 28px 20px;
+    border-bottom: 1px solid var(--outline);
+  }
+  
+  .hero-left { max-width: 720px; }
+  h1 { margin: 0 0 10px; font-size: 2rem; }
+  .subtitle { margin: 0; color: var(--muted); line-height: 1.4; }
+  
+  .badges { margin-top: 12px; display: flex; gap: 10px; flex-wrap: wrap; }
+  .badge {
+    border: 1px solid var(--outline);
+    padding: 6px 10px;
+    border-radius: 999px;
+    color: var(--muted);
+  }
+  
+  .logo {
+    width: 110px;
+    height: 110px;
+    object-fit: contain;
+    border-radius: 16px;
+    border: 1px solid var(--outline);
+    background: rgba(255,255,255,0.03);
+    padding: 10px;
+  }
+  
+  .card {
+    margin: 18px 0;
+    padding: 18px;
+    background: rgba(17,26,51,0.86);
+    border: 1px solid var(--outline);
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  }
+  
+  h2 { margin-top: 0; }
+  h3 { margin-bottom: 8px; }
+  
+  .two-col {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 16px;
+    align-items: start;
+  }
+  .photo {
+    width: 100%;
+    border-radius: 14px;
+    border: 1px solid var(--outline);
+  }
+  .caption { margin: 8px 0 0; color: var(--muted); font-size: 0.9rem; }
+  
+  .callout {
+    margin: 12px 0;
+    padding: 12px 14px;
+    border-left: 4px solid var(--accent);
+    background: rgba(126,224,129,0.08);
+    border-radius: 12px;
+  }
+  
+  .video-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  figure { margin: 0; }
+  video {
+    width: 100%;
+    border-radius: 14px;
+    border: 1px solid var(--outline);
+    background: rgba(0,0,0,0.25);
+  }
+  figcaption { margin-top: 8px; color: var(--muted); font-size: 0.9rem; }
+  
+  .footer {
+    text-align: center;
+    color: var(--muted);
+    padding: 10px 0 30px;
+  }
+  
+  @media (max-width: 800px) {
+    .hero { flex-direction: column; align-items: flex-start; }
+    .two-col { grid-template-columns: 1fr; }
+    .video-grid { grid-template-columns: 1fr; }
+  }
+  
