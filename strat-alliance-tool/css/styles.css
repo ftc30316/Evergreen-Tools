@@ -1,284 +1,156 @@
 /* =========================================================
-   Evergreen Dynamics – Alliance Strategy Page Theme
-   Palette: Evergreen / Pine / Gold / Neutral White
+   Evergreen Dynamics – Alliance Strategy Page
+   CLEAN, ERROR-FREE, DRIVE TEAM SEPARATED
    ========================================================= */
 
 /* ---------- COLOR SYSTEM ---------- */
 :root {
-    --bg-dark: #07140e;          /* deep evergreen */
-    --bg-panel: #0f261a;         /* forest green */
-    --bg-soft: #143626;          /* pine */
-    
-    --text-main: #f3fff8;        /* off-white */
-    --text-muted: #b8e6c8;       /* soft mint */
-    
-    --accent-green: #2fd16a;     /* evergreen highlight */
-    --accent-gold: #f5c84b;      /* alliance gold */
-    
-    --border-soft: rgba(255,255,255,0.14);
-    --shadow-soft: rgba(0,0,0,0.35);
-  }
-  
-  /* ---------- BASE ---------- */
-  * {
-    box-sizing: border-box;
-  }
-  
-  body {
-    margin: 0;
-    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-    color: var(--text-main);
-  
-    background:
-      radial-gradient(900px 500px at 15% -10%, rgba(47,209,106,0.20), transparent),
-      radial-gradient(900px 500px at 85% 10%, rgba(245,200,75,0.12), transparent),
-      linear-gradient(180deg, #05100a, var(--bg-dark));
-  
-    line-height: 1.5;
-  }
-  
-  /* ---------- TYPOGRAPHY ---------- */
-  h1, h2, h3 {
-    letter-spacing: 0.3px;
-  }
-  
-  h1 {
-    font-size: 2.2rem;
-    margin: 0 0 12px;
-  }
-  
-  h2 {
-    margin: 0 0 12px;
-    padding-bottom: 6px;
-    border-bottom: 1px solid rgba(47,209,106,0.35);
-  }
-  
-  h3 {
-    margin-top: 18px;
-    margin-bottom: 6px;
-    color: var(--accent-green);
-  }
-  
-  p {
-    margin: 0 0 10px;
-    color: var(--text-main);
-  }
-  
-  ul {
-    padding-left: 18px;
-  }
-  
-  li {
-    margin-bottom: 6px;
-  }
-  
-  /* ---------- LAYOUT ---------- */
-  .container {
-    max-width: 1050px;
-    margin: 0 auto;
-    padding: 22px;
-  }
-  
-  /* ---------- HERO ---------- */
-  .hero {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 24px;
-    padding: 26px 22px;
-  
-    background: linear-gradient(
-      90deg,
-      rgba(47,209,106,0.18),
-      rgba(245,200,75,0.08)
-    );
-  
-    border-bottom: 1px solid var(--border-soft);
-  }
-  
-  .hero p {
-    color: var(--text-muted);
-  }
-  
-  /* ---------- LOGO ---------- */
-  .team-logo {
-    width: 120px;
-    height: 120px;
-    object-fit: contain;
-  
-    background: rgba(47,209,106,0.10);
-    padding: 12px;
-  
-    border-radius: 18px;
-    border: 1px solid var(--border-soft);
-    box-shadow: 0 6px 18px var(--shadow-soft);
-  }
-  
-  /* ---------- CARDS ---------- */
-  .card {
-    margin: 18px 0;
-    padding: 20px;
-  
-    background: rgba(15, 38, 26, 0.92);
-    border: 1px solid var(--border-soft);
-    border-radius: 20px;
-  
-    box-shadow: 0 12px 28px var(--shadow-soft);
-  }
-  
-  /* ---------- INTRO GRID ---------- */
-  .intro-grid {
-    display: grid;
-    grid-template-columns: 1.2fr 0.8fr;
-    gap: 22px;
-    align-items: center;
-  }
-  
-  /* ---------- TEAM PHOTO ---------- */
-  .team-photo {
-    width: 100%;
-    max-width: 420px;
-  
-    border-radius: 20px;
-    border: 1px solid var(--border-soft);
-    box-shadow: 0 10px 28px var(--shadow-soft);
-  }
-  
-  /* ---------- CALLOUT / STRATEGY BOX ---------- */
-  .callout {
-    margin: 14px 0;
-    padding: 14px 16px;
-  
-    background: rgba(47,209,106,0.10);
-    border-left: 4px solid var(--accent-green);
-    border-radius: 14px;
-  
-    color: var(--text-main);
-  }
-  
-  /* ---------- VIDEO GRID ---------- */
-  .video-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(260px, 420px));
-    gap: 16px;
-    align-items: start;
-  }
-  
-  .video-grid figure {
-    margin: 0;
-  }
-  
-  .video-grid video {
-    width: 100%;
-    max-width: 420px;
-    aspect-ratio: 16 / 9;
-  
-    border-radius: 16px;
-    border: 1px solid var(--border-soft);
-    background: rgba(0,0,0,0.45);
-  }
-  
-  .video-grid figcaption {
-    margin-top: 6px;
-    font-size: 0.9rem;
-    color: var(--text-muted);
-  }
-  
-  /* ---------- FOOTER ---------- */
-  .footer {
-    text-align: center;
-    color: var(--text-muted);
-    padding: 24px 0 40px;
-  }
-  
-  /* ---------- MOBILE ---------- */
-  @media (max-width: 850px) {
-    .hero {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-  
-    .intro-grid {
-      grid-template-columns: 1fr;
-    }
-  
-    .video-grid {
-      grid-template-columns: 1fr;
-    }
-  
-    .team-logo {
-      width: 100px;
-      height: 100px;
-    }
-  }
-  
-  
-  .logo {
-    width: 110px;
-    height: 110px;
-    object-fit: contain;
-    border-radius: 16px;
-    border: 1px solid var(--outline);
-    background: rgba(255,255,255,0.03);
-    padding: 10px;
-  }
-  
-  .card {
-    margin: 18px 0;
-    padding: 18px;
-    background: rgba(17,26,51,0.86);
-    border: 1px solid var(--outline);
-    border-radius: 18px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-  }
-  
-  h2 { margin-top: 0; }
-  h3 { margin-bottom: 8px; }
-  
-  .two-col {
-    display: grid;
-    grid-template-columns: 1.2fr 0.8fr;
-    gap: 16px;
-    align-items: start;
-  }
-  .photo {
-    width: 100%;
-    border-radius: 14px;
-    border: 1px solid var(--outline);
-  }
-  .caption { margin: 8px 0 0; color: var(--muted); font-size: 0.9rem; }
-  
-  .callout {
-    margin: 12px 0;
-    padding: 12px 14px;
-    border-left: 4px solid var(--accent);
-    background: rgba(126,224,129,0.08);
-    border-radius: 12px;
-  }
-  
-  .video-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-  }
-  figure { margin: 0; }
-  video {
-    width: 100%;
-    border-radius: 14px;
-    border: 1px solid var(--outline);
-    background: rgba(0,0,0,0.25);
-  }
-  figcaption { margin-top: 8px; color: var(--muted); font-size: 0.9rem; }
-  
-  .footer {
-    text-align: center;
-    color: var(--muted);
-    padding: 10px 0 30px;
-  }
-  
-  @media (max-width: 800px) {
-    .hero { flex-direction: column; align-items: flex-start; }
-    .two-col { grid-template-columns: 1fr; }
-    .video-grid { grid-template-columns: 1fr; }
-  }
-  
+  --bg-dark: #07140e;
+  --bg-panel: #0f261a;
+  --bg-soft: #143626;
+
+  --text-main: #f3fff8;
+  --text-muted: #b8e6c8;
+
+  --accent-green: #2fd16a;
+  --accent-gold: #f5c84b;
+
+  --border-soft: rgba(255,255,255,0.14);
+  --shadow-soft: rgba(0,0,0,0.35);
+}
+
+/* ---------- BASE ---------- */
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  color: var(--text-main);
+  background:
+    radial-gradient(900px 500px at 15% -10%, rgba(47,209,106,0.18), transparent),
+    radial-gradient(900px 500px at 85% 10%, rgba(245,200,75,0.10), transparent),
+    linear-gradient(180deg, #05100a, var(--bg-dark));
+  line-height: 1.5;
+}
+
+/* ---------- TYPOGRAPHY ---------- */
+h1 { font-size: 2.2rem; margin-bottom: 12px; }
+h2 { margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid rgba(47,209,106,0.35); }
+h3 { margin-top: 18px; color: var(--accent-green); }
+
+/* ---------- LAYOUT ---------- */
+.container { max-width: 1050px; margin: 0 auto; padding: 22px; }
+
+.hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 26px 22px;
+  gap: 24px;
+  background: linear-gradient(90deg, rgba(47,209,106,0.18), rgba(245,200,75,0.08));
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.logo {
+  width: 110px;
+  height: 110px;
+  padding: 12px;
+  background: rgba(47,209,106,0.10);
+  border-radius: 18px;
+  border: 1px solid var(--border-soft);
+}
+
+/* ---------- CARD ---------- */
+.card {
+  margin: 18px 0;
+  padding: 20px;
+  background: rgba(15, 38, 26, 0.92);
+  border: 1px solid var(--border-soft);
+  border-radius: 20px;
+  box-shadow: 0 12px 28px var(--shadow-soft);
+}
+
+/* ---------- TWO COLUMN GRID ---------- */
+.two-col { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 18px; }
+
+/* ---------- NORMAL TEAM PHOTO ---------- */
+.photo {
+  width: 100%;
+  max-width: 420px;
+  display: block;
+  margin: 0 auto;
+  border-radius: 18px;
+  border: 1px solid var(--border-soft);
+  box-shadow: 0 10px 28px var(--shadow-soft);
+}
+
+.drive-team-card {
+  width: 100%;
+  max-width: 1050px;
+  margin: 0 auto 24px;
+  padding: 20px;
+  text-align: center; /* centers all content inside the card */
+}
+
+.drive-team-photo-wrapper {
+  text-align: center; /* ensures photo and caption are centered */
+}
+
+.caption {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 6px;
+  text-align: center; /* centers the text */
+}
+
+
+
+
+
+/* ---------- CALLOUT ---------- */
+.callout {
+  margin: 14px 0;
+  padding: 14px 16px;
+  background: rgba(47,209,106,0.12);
+  border-left: 4px solid var(--accent-green);
+  border-radius: 14px;
+}
+
+/* REMOVE BOX FOR DRIVE COACH COMMUNICATION */
+#teleop .callout {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 6px 0;
+}
+
+/* ---------- VIDEO GRID ---------- */
+.video-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(260px, 420px));
+  gap: 16px;
+}
+
+video {
+  width: 100%;
+  border-radius: 16px;
+  border: 1px solid var(--border-soft);
+  background: rgba(0,0,0,0.45);
+}
+
+/* ---------- FOOTER ---------- */
+.footer {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 24px 0 40px;
+}
+
+/* ---------- MOBILE ---------- */
+@media (max-width: 850px) {
+  .two-col { grid-template-columns: 1fr; }
+  .hero { flex-direction: column; align-items: flex-start; }
+  .drive-team-card { max-width: 100%; }
+}
+
+
+
