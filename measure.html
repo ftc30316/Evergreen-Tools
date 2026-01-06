@@ -1,0 +1,574 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FTC Field Measure Tool</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #111a33;
+      --text: #e7ecff;
+      --muted: #a9b4e3;
+      --line: rgba(255,255,255,.12);
+      --accent: #7aa2ff;
+      --danger: #ff6b6b;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 14px;
+      --pad: 14px;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: radial-gradient(1200px 800px at 30% 0%, #162355 0%, var(--bg) 55%);
+      color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+
+    .app {
+      height: 100%;
+      display: flex;
+      gap: 12px;
+      padding: 12px;
+      box-sizing: border-box;
+    }
+
+    .fieldPanel {
+      flex: 1 1 auto;
+      min-width: 280px;
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: var(--pad);
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .title {
+      font-weight: 800;
+      letter-spacing: 0.2px;
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+    .title small { color: var(--muted); font-weight: 600; }
+
+    .controls {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    button {
+      background: rgba(255,255,255,.08);
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 8px 10px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+    button:hover { border-color: rgba(255,255,255,.22); }
+    button.danger { border-color: rgba(255,107,107,.35); }
+    button.danger:hover { border-color: rgba(255,107,107,.65); }
+
+    .hint {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.25;
+    }
+
+    .fieldWrap {
+      position: relative;
+      flex: 1 1 auto;
+      min-height: 200px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      border-radius: 12px;
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.10);
+    }
+
+    .fieldStage {
+      width: min(calc(100vw - 12px*2 - 360px - 12px*1 - 14px*2), calc(100vh - 12px*2 - 90px));
+      height: min(calc(100vw - 12px*2 - 360px - 12px*1 - 14px*2), calc(100vh - 12px*2 - 90px));
+      max-width: 100%;
+      max-height: 100%;
+      aspect-ratio: 1 / 1;
+      position: relative;
+    }
+
+    @media (max-width: 900px) {
+      .app { flex-direction: column; }
+      .fieldStage {
+        width: min(calc(100vw - 12px*2 - 14px*2), calc(55vh));
+        height: min(calc(100vw - 12px*2 - 14px*2), calc(55vh));
+      }
+    }
+
+    #fieldImg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      user-select: none;
+      -webkit-user-drag: none;
+      pointer-events: none;
+    }
+
+    #overlay {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+    }
+
+    #tooltip {
+      position: absolute;
+      z-index: 20;
+      background: rgba(10, 14, 30, 0.92);
+      border: 1px solid rgba(255,255,255,.18);
+      color: var(--text);
+      padding: 6px 8px;
+      border-radius: 10px;
+      font-size: 12.5px;
+      pointer-events: none;
+      transform: translate(12px, 12px);
+      white-space: nowrap;
+      box-shadow: var(--shadow);
+      display: none;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    .tablePanel {
+      width: 360px;
+      flex: 0 0 360px;
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: var(--pad);
+      box-sizing: border-box;
+      overflow: auto;
+    }
+    @media (max-width: 900px) {
+      .tablePanel { width: 100%; flex: 0 0 auto; }
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead th {
+      text-align: left;
+      color: var(--muted);
+      font-weight: 800;
+      padding: 10px 8px;
+      border-bottom: 1px solid rgba(255,255,255,.14);
+      position: sticky;
+      top: 0;
+      background: rgba(17,26,51,.85);
+      backdrop-filter: blur(6px);
+      z-index: 5;
+    }
+    tbody td {
+      padding: 9px 8px;
+      border-bottom: 1px solid rgba(255,255,255,.09);
+      vertical-align: top;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(122,162,255,.12);
+      border: 1px solid rgba(122,162,255,.25);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 800;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    .muted { color: var(--muted); }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+
+    /* SVG styles */
+    .pt { cursor: grab; }
+    .pt:active { cursor: grabbing; }
+
+    .segLine {
+      stroke: rgba(122,162,255,0.9);
+      stroke-width: 0.8;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .label {
+      font-size: 3.5px;
+      font-weight: 800;
+      fill: rgba(231,236,255,0.95);
+      paint-order: stroke;
+      stroke: rgba(0,0,0,0.55);
+      stroke-width: 0.9;
+      vector-effect: non-scaling-stroke;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .labelBg {
+      fill: rgba(10,14,30,0.65);
+      stroke: rgba(255,255,255,0.15);
+      stroke-width: 0.5;
+      vector-effect: non-scaling-stroke;
+      rx: 1.2;
+      ry: 1.2;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="fieldPanel">
+      <div class="header">
+        <div class="title">
+          FTC Field Measure
+          <small>Origin (0,0) at center • Units: inches</small>
+        </div>
+        <div class="controls">
+          <span class="badge" id="ptCount">0 points</span>
+          <button id="clearBtn" class="danger">Clear</button>
+        </div>
+      </div>
+
+      <div class="hint">
+        Hover to see coordinates. Click to add points. Drag points to move them.
+        <span class="mono">Ctrl+Click</span> a point to delete it.
+      </div>
+
+      <div class="fieldWrap">
+        <div class="fieldStage" id="stage">
+          <img id="fieldImg" src="ftc-field-dark.png" alt="FTC Field" />
+
+          <svg id="overlay" viewBox="-72 -72 144 144" preserveAspectRatio="xMidYMid meet">
+            <!-- axes -->
+            <line x1="-72" y1="0" x2="72" y2="0" stroke="rgba(255,255,255,.18)" stroke-width="0.35" vector-effect="non-scaling-stroke"></line>
+            <line x1="0" y1="-72" x2="0" y2="72" stroke="rgba(255,255,255,.18)" stroke-width="0.35" vector-effect="non-scaling-stroke"></line>
+
+            <!-- segments behind points -->
+            <g id="segmentsLayer"></g>
+            <g id="pointsLayer"></g>
+          </svg>
+
+          <div id="tooltip"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tablePanel">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px;">
+        <div style="font-weight:900;">Segments</div>
+        <div class="muted" style="font-size:12px;">Consecutive points: P0→P1, P1→P2, …</div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th style="width:72px;">Seg</th>
+            <th>From → To</th>
+            <th style="width:92px;">Length</th>
+          </tr>
+        </thead>
+        <tbody id="segBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const FIELD_HALF = 72;
+
+    const overlay = document.getElementById('overlay');
+    const stage = document.getElementById('stage');
+    const tooltip = document.getElementById('tooltip');
+    const pointsLayer = document.getElementById('pointsLayer');
+    const segmentsLayer = document.getElementById('segmentsLayer');
+    const segBody = document.getElementById('segBody');
+    const ptCount = document.getElementById('ptCount');
+    const clearBtn = document.getElementById('clearBtn');
+
+    let points = [];
+    let nextId = 0;
+    let draggingId = null;
+
+    function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+    function dist(a, b) { return Math.hypot(b.x - a.x, b.y - a.y); }
+
+    function formatInches(n) {
+      const r = Math.round(n * 10) / 10;
+      return (Object.is(r, -0) ? 0 : r).toFixed(1);
+    }
+
+    function updateBadge() {
+      ptCount.textContent = `${points.length} point${points.length === 1 ? '' : 's'}`;
+    }
+
+    function eventToFieldInches(evt) {
+      const pt = overlay.createSVGPoint();
+      pt.x = evt.clientX;
+      pt.y = evt.clientY;
+      const ctm = overlay.getScreenCTM();
+      if (!ctm) return null;
+      const svgP = pt.matrixTransform(ctm.inverse());
+      const x = clamp(svgP.x, -FIELD_HALF, FIELD_HALF);
+      const y = clamp(-svgP.y, -FIELD_HALF, FIELD_HALF); // invert for logical +Y up
+      return { x, y };
+    }
+
+    function getMousePosInStage(evt) {
+      const rect = stage.getBoundingClientRect();
+      return { x: evt.clientX - rect.left, y: evt.clientY - rect.top };
+    }
+
+    // Utility: make a text label with a rounded rect background sized to text
+    function svgLabel(x, y, text, anchor = "start") {
+      const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+
+      const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      t.setAttribute("class", "label");
+      t.setAttribute("x", x);
+      t.setAttribute("y", y);
+      t.setAttribute("text-anchor", anchor);
+      t.textContent = text;
+
+      // Append first to measure bbox
+      g.appendChild(t);
+      segmentsLayer.appendChild(g); // temp attach to measure
+      const bb = t.getBBox();
+
+      // Background with a small pad
+      const padX = 1.2, padY = 0.8;
+      const r = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+      r.setAttribute("class", "labelBg");
+      r.setAttribute("x", bb.x - padX);
+      r.setAttribute("y", bb.y - padY);
+      r.setAttribute("width", bb.width + padX * 2);
+      r.setAttribute("height", bb.height + padY * 2);
+
+      // Rebuild order: bg then text
+      g.innerHTML = "";
+      g.appendChild(r);
+      g.appendChild(t);
+
+      // Remove temp attach; caller will append g where it belongs
+      segmentsLayer.removeChild(g);
+
+      return g;
+    }
+
+    function renderSegments() {
+      segmentsLayer.innerHTML = "";
+
+      for (let i = 1; i < points.length; i++) {
+        const a = points[i - 1];
+        const b = points[i];
+
+        // Convert logical y to svg y
+        const x1 = a.x, y1 = -a.y;
+        const x2 = b.x, y2 = -b.y;
+
+        // Line
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("class", "segLine");
+        line.setAttribute("x1", x1);
+        line.setAttribute("y1", y1);
+        line.setAttribute("x2", x2);
+        line.setAttribute("y2", y2);
+        segmentsLayer.appendChild(line);
+
+        // Midpoint label with length
+        const mx = (x1 + x2) / 2;
+        const my = (y1 + y2) / 2;
+
+        const L = dist(a, b);
+        const lbl = svgLabel(mx, my, `${formatInches(L)}"`, "middle");
+        // nudge slightly above the line
+        lbl.setAttribute("transform", `translate(0, -2.0)`);
+        segmentsLayer.appendChild(lbl);
+      }
+    }
+
+    function renderPoints() {
+      pointsLayer.innerHTML = "";
+
+      for (const p of points) {
+        const cx = p.x;
+        const cy = -p.y;
+
+        const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        g.setAttribute("data-id", p.id);
+        g.classList.add("pt");
+
+        const halo = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        halo.setAttribute("cx", cx);
+        halo.setAttribute("cy", cy);
+        halo.setAttribute("r", 2.8);
+        halo.setAttribute("fill", "rgba(122,162,255,0.22)");
+        halo.setAttribute("stroke", "rgba(122,162,255,0.55)");
+        halo.setAttribute("stroke-width", "0.6");
+        halo.setAttribute("vector-effect", "non-scaling-stroke");
+
+        const core = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        core.setAttribute("cx", cx);
+        core.setAttribute("cy", cy);
+        core.setAttribute("r", 1.4);
+        core.setAttribute("fill", "rgba(255,255,255,0.92)");
+        core.setAttribute("stroke", "rgba(0,0,0,0.25)");
+        core.setAttribute("stroke-width", "0.35");
+        core.setAttribute("vector-effect", "non-scaling-stroke");
+
+        g.appendChild(halo);
+        g.appendChild(core);
+
+        // Point label: (x, y) in inches
+        const txt = `( ${formatInches(p.x)}, ${formatInches(p.y)} )`;
+        const labelG = (function(){
+          // Create label at an offset from the point
+          const lx = cx + 3.2;
+          const ly = cy - 3.2;
+          return svgLabel(lx, ly, txt, "start");
+        })();
+        pointsLayer.appendChild(labelG);
+
+        // pointer interactions
+        g.addEventListener("pointerdown", (e) => {
+          if (e.ctrlKey) {
+            e.preventDefault();
+            removePointById(p.id);
+            return;
+          }
+          draggingId = p.id;
+          overlay.setPointerCapture(e.pointerId);
+          e.preventDefault();
+        });
+
+        pointsLayer.appendChild(g);
+      }
+
+      updateBadge();
+    }
+
+    function renderSegmentsTable() {
+      segBody.innerHTML = "";
+      for (let i = 1; i < points.length; i++) {
+        const a = points[i - 1];
+        const b = points[i];
+        const L = dist(a, b);
+
+        const tr = document.createElement("tr");
+
+        const tdSeg = document.createElement("td");
+        tdSeg.innerHTML = `<span class="mono">S${i - 1}</span>`;
+        tr.appendChild(tdSeg);
+
+        const tdFromTo = document.createElement("td");
+        tdFromTo.innerHTML = `
+          <div class="mono">P${a.id} → P${b.id}</div>
+          <div class="muted mono" style="font-size:12px; margin-top:2px;">
+            ( ${formatInches(a.x)}, ${formatInches(a.y)} ) → ( ${formatInches(b.x)}, ${formatInches(b.y)} )
+          </div>
+        `;
+        tr.appendChild(tdFromTo);
+
+        const tdLen = document.createElement("td");
+        tdLen.innerHTML = `<span class="mono">${formatInches(L)}"</span>`;
+        tr.appendChild(tdLen);
+
+        segBody.appendChild(tr);
+      }
+    }
+
+    function rerenderAll() {
+      renderSegments();     // must be before points labels because svgLabel measures using segmentsLayer temp
+      renderPoints();
+      renderSegmentsTable();
+    }
+
+    function addPoint(x, y) {
+      points.push({ id: nextId++, x, y });
+      rerenderAll();
+    }
+
+    function removePointById(id) {
+      points = points.filter(p => p.id !== id);
+      draggingId = null;
+      rerenderAll();
+    }
+
+    function movePoint(id, x, y) {
+      const p = points.find(pp => pp.id === id);
+      if (!p) return;
+      p.x = x;
+      p.y = y;
+      rerenderAll();
+    }
+
+    // Tooltip & dragging
+    overlay.addEventListener("pointermove", (evt) => {
+      const xy = eventToFieldInches(evt);
+      if (!xy) return;
+
+      const pos = getMousePosInStage(evt);
+      tooltip.style.left = `${pos.x}px`;
+      tooltip.style.top = `${pos.y}px`;
+      tooltip.style.display = "block";
+      tooltip.textContent = `x=${formatInches(xy.x)}", y=${formatInches(xy.y)}"`;
+
+      if (draggingId !== null) {
+        movePoint(draggingId, xy.x, xy.y);
+      }
+    });
+
+    overlay.addEventListener("pointerleave", () => {
+      tooltip.style.display = "none";
+      draggingId = null;
+    });
+
+    overlay.addEventListener("pointerup", (evt) => {
+      draggingId = null;
+      try { overlay.releasePointerCapture(evt.pointerId); } catch {}
+    });
+
+    // Click on empty field adds point
+    overlay.addEventListener("click", (evt) => {
+      const targetPt = evt.target.closest?.("g.pt");
+      if (targetPt) return;
+
+      const xy = eventToFieldInches(evt);
+      if (!xy) return;
+      addPoint(xy.x, xy.y);
+    });
+
+    clearBtn.addEventListener("click", () => {
+      points = [];
+      nextId = 0;
+      draggingId = null;
+      rerenderAll();
+    });
+
+    rerenderAll();
+  </script>
+</body>
+</html>
