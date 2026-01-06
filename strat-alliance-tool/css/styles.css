@@ -86,7 +86,7 @@ h3 { margin-top: 18px; color: var(--accent-green); }
 
 .drive-team-card {
   width: 100%;
-  max-width: 1050px;
+  max-width: 1200px;
   margin: 0 auto 24px;
   padding: 20px;
   text-align: center; /* centers all content inside the card */
