@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FTC Field Distance & Heading Tool</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      display: flex;
+      height: 100vh;
+      font-family: Arial, sans-serif;
+    }
+    #field-container {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #111;
+      position: relative;
+    }
+    #field-wrapper {
+      position: relative;
+      width: min(100vw, 100vh);
+      height: min(100vw, 100vh);
+    }
+    #field {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    #overlay {
+      position: absolute;
+      inset: 0;
+    }
+    .point {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: red;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      cursor: grab;
+    }
+    #tooltip {
+      position: absolute;
+      background: rgba(0,0,0,0.8);
+      color: white;
+      padding: 4px 6px;
+      font-size: 12px;
+      border-radius: 4px;
+      pointer-events: none;
+      display: none;
+    }
+    #table-container {
+      width: 320px;
+      background: #f4f4f4;
+      padding: 10px;
+      overflow-y: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 6px;
+      text-align: center;
+      font-size: 14px;
+    }
+    th { background: #ddd; }
+  </style>
+</head>
+<body>
+
+<div id="field-container">
+  <div id="field-wrapper">
+    <img id="field" src="ftc-field.png" />
+    <svg id="overlay"></svg>
+    <div id="tooltip"></div>
+  </div>
+</div>
+
+<div id="table-container">
+  <h3>Segments</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Length (in)</th>
+        <th>Heading (°)</th>
+      </tr>
+    </thead>
+    <tbody id="segment-table"></tbody>
+  </table>
+</div>
+
+<script>
+  const FIELD_SIZE_IN = 144; // 12ft = 144in
+  const wrapper = document.getElementById('field-wrapper');
+  const overlay = document.getElementById('overlay');
+  const tooltip = document.getElementById('tooltip');
+  const tableBody = document.getElementById('segment-table');
+
+  let points = [];
+  let draggingPoint = null;
+
+  function pxToIn(px, sizePx) {
+    return (px / sizePx) * FIELD_SIZE_IN - FIELD_SIZE_IN / 2;
+  }
+
+  function inToPx(valIn, sizePx) {
+    return ((valIn + FIELD_SIZE_IN / 2) / FIELD_SIZE_IN) * sizePx;
+  }
+
+  function updateTooltip(e) {
+    const rect = wrapper.getBoundingClientRect();
+    const xPx = e.clientX - rect.left;
+    const yPx = e.clientY - rect.top;
+    const size = rect.width;
+
+    const xIn = pxToIn(xPx, size).toFixed(1);
+    const yIn = (-pxToIn(yPx, size)).toFixed(1);
+
+    tooltip.style.left = e.clientX + 10 + 'px';
+    tooltip.style.top = e.clientY + 10 + 'px';
+    tooltip.innerText = `(${xIn}, ${yIn}) in`;
+    tooltip.style.display = 'block';
+  }
+
+  function hideTooltip() {
+    tooltip.style.display = 'none';
+  }
+
+  function redraw() {
+    overlay.innerHTML = '';
+    tableBody.innerHTML = '';
+
+    const size = wrapper.getBoundingClientRect().width;
+
+    // Draw lines
+    for (let i = 0; i < points.length - 1; i++) {
+      const p1 = points[i];
+      const p2 = points[i + 1];
+
+      const x1 = inToPx(p1.x, size);
+      const y1 = inToPx(-p1.y, size);
+      const x2 = inToPx(p2.x, size);
+      const y2 = inToPx(-p2.y, size);
+
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', x1);
+      line.setAttribute('y1', y1);
+      line.setAttribute('x2', x2);
+      line.setAttribute('y2', y2);
+      line.setAttribute('stroke', 'cyan');
+      line.setAttribute('stroke-width', '2');
+      overlay.appendChild(line);
+
+      const dx = p2.x - p1.x;
+      const dy = p2.y - p1.y;
+      const length = Math.hypot(dx, dy).toFixed(2);
+      const heading = (Math.atan2(dy, dx) * 180 / Math.PI).toFixed(1);
+
+      const row = document.createElement('tr');
+      row.innerHTML = `<td>${i + 1}</td><td>${length}</td><td>${heading}</td>`;
+      tableBody.appendChild(row);
+    }
+
+    // Draw points
+    points.forEach((p, idx) => {
+      const div = document.createElement('div');
+      div.className = 'point';
+      div.style.left = inToPx(p.x, size) + 'px';
+      div.style.top = inToPx(-p.y, size) + 'px';
+
+      div.onmousedown = (e) => {
+        if (e.ctrlKey) {
+          points.splice(idx, 1);
+          redraw();
+          return;
+        }
+        draggingPoint = p;
+        e.stopPropagation();
+      };
+
+      overlay.appendChild(div);
+    });
+  }
+
+  wrapper.addEventListener('mousemove', (e) => {
+    updateTooltip(e);
+    if (draggingPoint) {
+      const rect = wrapper.getBoundingClientRect();
+      const size = rect.width;
+      const xPx = e.clientX - rect.left;
+      const yPx = e.clientY - rect.top;
+      draggingPoint.x = pxToIn(xPx, size);
+      draggingPoint.y = -pxToIn(yPx, size);
+      redraw();
+    }
+  });
+
+  wrapper.addEventListener('mouseleave', hideTooltip);
+
+  wrapper.addEventListener('mouseup', () => draggingPoint = null);
+
+  wrapper.addEventListener('click', (e) => {
+    if (draggingPoint) return;
+    const rect = wrapper.getBoundingClientRect();
+    const size = rect.width;
+    const xPx = e.clientX - rect.left;
+    const yPx = e.clientY - rect.top;
+
+    points.push({
+      x: pxToIn(xPx, size),
+      y: -pxToIn(yPx, size)
+    });
+    redraw();
+  });
+
+  window.addEventListener('resize', redraw);
+</script>
+
+</body>
+</html>
