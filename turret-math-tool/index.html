@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FTC Triangulation Tool</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FTC Triangulation Tool (Mobile)</title>
     <style>
         body {
             margin: 0;
@@ -13,7 +13,14 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #2c2c2c;
             color: white;
-            overflow: hidden;
+            overflow: hidden; /* Prevent body scroll */
+        }
+
+        /* Layout Container */
+        #main-layout {
+            display: flex;
+            width: 100%;
+            height: 100%;
         }
 
         /* Left Side: Field Display */
@@ -29,10 +36,11 @@
 
         #canvas-wrapper {
             position: relative;
-            width: 90vmin; 
-            height: 90vmin;
             box-shadow: 0 0 20px rgba(0,0,0,0.5);
             background-color: #000;
+            /* Default for desktop: maximize based on smallest dimension */
+            width: 90vmin; 
+            height: 90vmin;
         }
 
         #field-canvas {
@@ -43,6 +51,7 @@
             height: 100%;
             cursor: crosshair;
             z-index: 2;
+            touch-action: none; /* Crucial: disables browser handling of gestures */
         }
 
         #field-bg {
@@ -76,39 +85,76 @@
             border: 1px solid #555;
         }
 
-        /* Right Side: Data Table */
+        /* Right Side: Data Table & Controls */
         #sidebar {
             width: 380px; 
+            min-width: 300px;
             background-color: #2c2c2c;
             border-left: 1px solid #444;
             display: flex;
             flex-direction: column;
             box-shadow: -5px 0 15px rgba(0,0,0,0.3);
+            z-index: 20;
         }
 
         .sidebar-header {
-            padding: 20px;
+            padding: 15px;
             background-color: #383838;
             border-bottom: 1px solid #444;
         }
 
-        h2 { margin: 0 0 10px 0; font-size: 1.2rem; }
-        p.instructions { margin: 0; font-size: 0.85rem; color: #aaa; line-height: 1.4; }
+        h2 { margin: 0 0 10px 0; font-size: 1.1rem; }
+        p.instructions { margin: 0; font-size: 0.8rem; color: #aaa; line-height: 1.4; }
 
         .table-container {
             flex: 1;
             padding: 10px;
+            overflow-y: auto;
         }
 
+        /* Mobile Controls */
+        #controls-area {
+            padding: 10px;
+            background: #252525;
+            border-top: 1px solid #444;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .rotate-btn {
+            background-color: #444;
+            color: white;
+            border: 1px solid #555;
+            border-radius: 8px;
+            padding: 15px 25px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            user-select: none; /* Prevent text selection on rapid click */
+            touch-action: manipulation;
+            font-weight: bold;
+            flex: 1;
+            max-width: 150px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .rotate-btn:active {
+            background-color: #4CAF50;
+            border-color: #4CAF50;
+        }
+
+        /* Data Tables */
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.9rem;
+            font-size: 0.85rem; 
             margin-top: 10px;
         }
 
         th, td {
-            padding: 12px 8px;
+            padding: 10px 6px;
             text-align: left;
             border-bottom: 1px solid #444;
         }
@@ -126,30 +172,68 @@
             font-weight: bold; 
         }
 
-        #current-pos-display {
+        #status-container {
             background: #222;
             padding: 10px;
             border-radius: 4px;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             border: 1px solid #444;
-            font-family: monospace;
-            text-align: center;
-            font-size: 1.1em;
-            color: #4CAF50;
+            display: flex;
+            flex-direction: column;
+            gap: 6px; 
         }
-        
-        #heading-display {
-            text-align: center;
-            color: #FFEB3B;
-            font-size: 0.9em;
-            margin-top: 5px;
+
+        #current-pos-display, #heading-display {
             font-family: monospace;
+            font-size: 1.0em;
+            color: #4CAF50;
+            text-align: left;
+            margin: 0;
+        }
+
+        /* --- MOBILE RESPONSIVE CSS --- */
+        @media (max-width: 800px) {
+            body { overflow: auto; } /* Allow scroll if needed on very small screens */
+            #main-layout {
+                flex-direction: column; /* Stack vertically */
+            }
+
+            #field-container {
+                flex: none; /* Don't stretch indefinitely */
+                width: 100%;
+                /* Maintain square aspect ratio manually via JS or simplified height */
+                height: auto;
+                padding: 10px 0;
+            }
+
+            #canvas-wrapper {
+                /* On mobile, occupy most of the width */
+                width: 95vw;
+                height: 95vw; 
+            }
+
+            #sidebar {
+                width: 100%;
+                border-left: none;
+                border-top: 1px solid #444;
+                flex: 1; /* Take remaining height */
+                box-shadow: none;
+            }
+            
+            .sidebar-header { display: none; } /* Save space on mobile */
+            
+            #controls-area {
+                order: -1; /* Move buttons to top of sidebar */
+                border-bottom: 1px solid #444;
+                border-top: none;
+            }
         }
 
     </style>
 </head>
 <body>
 
+<div id="main-layout">
     <div id="field-container">
         <div id="canvas-wrapper">
             <img id="field-bg" src="ftc-field.png" alt="FTC Field Image" onerror="this.style.display='none';">
@@ -162,26 +246,31 @@
         <div class="sidebar-header">
             <h2>Position Check</h2>
             <p class="instructions">
-                <b>Click</b> to place Robot Center.<br>
-                <b>← / → Keys</b> to rotate robot.<br>
-                <br>
-                <span style="color: #FF0000;">Red</span>: Red Goal (-66, 60).<br>
-                <span style="color: #2196F3;">Blue</span>: Blue Goal (-66, -60).<br>
-                Measurements from Turret (Offset 4").<br>
-                Yellow Crosshair = Turret Center.<br>
-                Green Line = Robot East (Heading).
+                <b>Tap/Drag</b>: Move Robot<br>
+                <b>Buttons/Keys</b>: Rotate<br>
+                <span style="color: #FF0000;">Red</span>: (-66, 58) | <span style="color: #2196F3;">Blue</span>: (-66, -58)<br>
+                Offset: Turret 4" West
             </p>
         </div>
+
+        <div id="controls-area">
+            <div class="rotate-btn" id="btn-left" oncontextmenu="return false;">&#8634; Left</div>
+            <div class="rotate-btn" id="btn-right" oncontextmenu="return false;">Right &#8635;</div>
+        </div>
+
         <div class="table-container">
-            <div id="current-pos-display">Select a point...</div>
-            <div id="heading-display">Heading: 0.0°</div>
+            <div id="status-container">
+                <div id="current-pos-display">Select a point...</div>
+                <div id="heading-display">Robot Heading: 0.0°</div>
+            </div>
             
             <table>
                 <thead>
                     <tr>
                         <th>Target</th>
                         <th>Dist (in)</th>
-                        <th>Angle (°)</th>
+                        <th>Field (°)</th>
+                        <th>Turret (°)</th>
                     </tr>
                 </thead>
                 <tbody id="table-body">
@@ -189,6 +278,7 @@
             </table>
         </div>
     </div>
+</div>
 
 <script>
     const canvas = document.getElementById('field-canvas');
@@ -201,23 +291,24 @@
 
     // Field Config
     const FIELD_SIZE_INCHES = 144;
-    // Turret is 4 inches "West" (Left) relative to robot frame
     const TURRET_OFFSET_DIST = 4; 
     
     // Fixed Targets
     const TARGETS = [
-        { x: -66, y: 60, color: '#FF5722', label: "Red Goal" },
-        { x: -66, y: -60, color: '#2196F3', label: "Blue Goal" } 
+        { x: -66, y: 58, color: '#FF5722', label: "Red Goal" },
+        { x: -66, y: -58, color: '#2196F3', label: "Blue Goal" } 
     ];
 
     // State
-    let userPoint = null; // {x, y} (Robot Center)
-    let robotHeading = 0; // Radians, 0 = East, CCW is positive
+    let userPoint = null; 
+    let robotHeading = 0; 
     let isDragging = false;
+    let rotationInterval = null; // For holding down buttons
 
     // --- Coordinate Conversion ---
 
     function resizeCanvas() {
+        // Use client dims to ensure 1:1 mapping with CSS size
         canvas.width = wrapper.clientWidth;
         canvas.height = wrapper.clientHeight;
         render();
@@ -237,93 +328,128 @@
         return { x, y };
     }
 
-    // Helper: Calculate Turret Field Position based on Robot Rotation
     function getTurretFieldPos() {
         if (!userPoint) return null;
-        // Turret is at x=-4 local. 
         const dx = -TURRET_OFFSET_DIST * Math.cos(robotHeading);
         const dy = -TURRET_OFFSET_DIST * Math.sin(robotHeading);
-        return {
-            x: userPoint.x + dx,
-            y: userPoint.y + dy
-        };
+        return { x: userPoint.x + dx, y: userPoint.y + dy };
     }
 
     // --- Interaction ---
 
-    function getMousePos(evt) {
+    function getEventPos(evt) {
         const rect = canvas.getBoundingClientRect();
-        return { x: evt.clientX - rect.left, y: evt.clientY - rect.top };
+        // Handle Touch vs Mouse
+        const clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
+        const clientY = evt.touches ? evt.touches[0].clientY : evt.clientY;
+        return { x: clientX - rect.left, y: clientY - rect.top };
     }
 
-    // Keyboard Rotation
-    window.addEventListener('keydown', (e) => {
-        if (!userPoint) return;
-        const ROT_SPEED = (2 * Math.PI) / 180; // 2 degrees per press
+    function handleInputStart(e) {
+        // Prevent default only if on canvas to allow scrolling elsewhere
+        if(e.target === canvas) e.preventDefault(); 
         
-        if (e.key === 'ArrowLeft') {
-            // CCW
-            robotHeading += ROT_SPEED;
-            render();
-            updateTable();
-        } else if (e.key === 'ArrowRight') {
-            // CW
-            robotHeading -= ROT_SPEED;
-            render();
-            updateTable();
-        }
-    });
-
-    // Mouse Move (Hover + Drag)
-    canvas.addEventListener('mousemove', (e) => {
-        const pos = getMousePos(e);
-        const fieldPos = toFieldCoords(pos.x, pos.y);
-
-        // Tooltip
-        tooltip.style.display = 'block';
-        tooltip.style.left = (e.clientX + 15) + 'px';
-        tooltip.style.top = (e.clientY + 15) + 'px';
-        tooltip.textContent = `X: ${fieldPos.x.toFixed(1)}", Y: ${fieldPos.y.toFixed(1)}"`;
-
-        if (isDragging) {
-            userPoint = { x: fieldPos.x, y: fieldPos.y };
-            render();
-            updateTable();
-        } else {
-            // Hover logic
-            if (userPoint) {
-                const screenP = toCanvasCoords(userPoint.x, userPoint.y);
-                const dist = Math.hypot(pos.x - screenP.x, pos.y - screenP.y);
-                canvas.style.cursor = (dist < 10) ? 'move' : 'crosshair';
-            }
-        }
-    });
-
-    canvas.addEventListener('mouseout', () => {
-        tooltip.style.display = 'none';
-        isDragging = false;
-    });
-
-    // Mouse Down (Place or Grab)
-    canvas.addEventListener('mousedown', (e) => {
-        const pos = getMousePos(e);
+        const pos = getEventPos(e);
         const fieldPos = toFieldCoords(pos.x, pos.y);
         
+        // Logic: Ctrl+Click deletes, otherwise places/drags
         if (e.ctrlKey) {
-            userPoint = null; // Delete
+            userPoint = null; 
         } else {
-            // Simply update position to click location (or start drag)
             userPoint = { x: fieldPos.x, y: fieldPos.y };
             isDragging = true;
         }
         render();
         updateTable();
-    });
+    }
 
-    canvas.addEventListener('mouseup', () => {
+    function handleInputMove(e) {
+        if (!isDragging && e.type !== 'mousemove') return; // Only track hover on mouse
+        if(e.target === canvas) e.preventDefault(); 
+
+        const pos = getEventPos(e);
+        const fieldPos = toFieldCoords(pos.x, pos.y);
+
+        // Tooltip logic
+        if (e.type === 'mousemove') {
+            tooltip.style.display = 'block';
+            tooltip.style.left = (e.clientX + 15) + 'px';
+            tooltip.style.top = (e.clientY + 15) + 'px';
+            tooltip.textContent = `X: ${fieldPos.x.toFixed(1)}", Y: ${fieldPos.y.toFixed(1)}"`;
+        }
+
+        if (isDragging) {
+            userPoint = { x: fieldPos.x, y: fieldPos.y };
+            render();
+            updateTable();
+        } else if (userPoint && e.type === 'mousemove') {
+            // Hover cursor change
+            const screenP = toCanvasCoords(userPoint.x, userPoint.y);
+            const dist = Math.hypot(pos.x - screenP.x, pos.y - screenP.y);
+            canvas.style.cursor = (dist < 10) ? 'move' : 'crosshair';
+        }
+    }
+
+    function handleInputEnd(e) {
+        if(e.target === canvas) e.preventDefault();
         isDragging = false;
+    }
+
+    // Event Listeners (Mouse)
+    canvas.addEventListener('mousedown', handleInputStart);
+    canvas.addEventListener('mousemove', handleInputMove);
+    window.addEventListener('mouseup', handleInputEnd);
+    canvas.addEventListener('mouseout', () => { tooltip.style.display = 'none'; });
+
+    // Event Listeners (Touch)
+    canvas.addEventListener('touchstart', handleInputStart, {passive: false});
+    canvas.addEventListener('touchmove', handleInputMove, {passive: false});
+    window.addEventListener('touchend', handleInputEnd);
+
+    // --- Rotation Controls ---
+
+    function rotateRobot(direction) {
+        if (!userPoint) return;
+        const ROT_SPEED = (2 * Math.PI) / 180; // 2 deg
+        if (direction === 'left') robotHeading += ROT_SPEED;
+        else robotHeading -= ROT_SPEED;
+        render();
+        updateTable();
+    }
+
+    // Keyboard
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft') rotateRobot('left');
+        if (e.key === 'ArrowRight') rotateRobot('right');
     });
 
+    // On-Screen Buttons (Hold to rotate)
+    const btnLeft = document.getElementById('btn-left');
+    const btnRight = document.getElementById('btn-right');
+
+    function startRotation(direction) {
+        if(rotationInterval) clearInterval(rotationInterval);
+        rotateRobot(direction); // Immediate trigger
+        rotationInterval = setInterval(() => rotateRobot(direction), 50); // Loop
+    }
+
+    function stopRotation() {
+        if(rotationInterval) clearInterval(rotationInterval);
+    }
+
+    // Wire up buttons (Mouse + Touch)
+    btnLeft.addEventListener('mousedown', () => startRotation('left'));
+    btnLeft.addEventListener('touchstart', (e) => { e.preventDefault(); startRotation('left'); });
+    
+    btnRight.addEventListener('mousedown', () => startRotation('right'));
+    btnRight.addEventListener('touchstart', (e) => { e.preventDefault(); startRotation('right'); });
+
+    ['mouseup', 'mouseleave', 'touchend'].forEach(evt => {
+        btnLeft.addEventListener(evt, stopRotation);
+        btnRight.addEventListener(evt, stopRotation);
+    });
+
+    // Window Resize
     window.addEventListener('resize', resizeCanvas);
 
     // --- Rendering ---
@@ -352,7 +478,7 @@
             const up = toCanvasCoords(userPoint.x, userPoint.y);
             const scale = canvas.width / FIELD_SIZE_INCHES;
             
-            // Get Turret Position in Screen Coords for Lines/Arcs
+            // Get Turret Position
             const turretField = getTurretFieldPos();
             const tp_screen = toCanvasCoords(turretField.x, turretField.y);
 
@@ -364,17 +490,16 @@
 
             ctx.save();
             ctx.translate(up.x, up.y);
-            // Canvas rotates Clockwise. If heading is + (CCW), we rotate by -heading
             ctx.rotate(-robotHeading); 
             
-            // Draw Square
+            // Square
             ctx.fillStyle = 'rgba(100, 100, 100, 0.4)'; 
             ctx.fillRect(-halfSquare, -halfSquare, squareSizePx, squareSizePx);
             ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)'; 
             ctx.lineWidth = 2;
             ctx.strokeRect(-halfSquare, -halfSquare, squareSizePx, squareSizePx);
 
-            // Draw Turret Circle (Local Coords: x = -4)
+            // Turret Circle
             ctx.beginPath();
             ctx.arc(-turretOffsetPx, 0, circleRadiusPx, 0, Math.PI * 2);
             ctx.fillStyle = 'rgba(0, 0, 0, 0.3)'; 
@@ -383,24 +508,22 @@
             ctx.lineWidth = 2;
             ctx.stroke();
 
-            // --- Draw Thick Green Line to East Edge ---
+            // Green Heading Line
             ctx.beginPath();
-            ctx.moveTo(0, 0); // Center
-            ctx.lineTo(halfSquare, 0); // East Edge (positive X local)
-            ctx.strokeStyle = '#4CAF50'; // Green
+            ctx.moveTo(0, 0); 
+            ctx.lineTo(halfSquare, 0); 
+            ctx.strokeStyle = '#4CAF50'; 
             ctx.lineWidth = 5;
             ctx.stroke();
-            // -----------------------------------------------
             
             ctx.restore();
-            // --------------------------------------------------
 
-            // Common Geometry for Arcs
+            // Common Geometry
             const arcRadius = 16 * scale; 
             const arrowLen = 12; 
             const arrowWidth = 7; 
 
-            // RED ARC (Red Goal, CCW) - ORIGIN IS TURRET
+            // RED ARC (CCW)
             const t1 = TARGETS[0];
             const p1 = toCanvasCoords(t1.x, t1.y);
             const angle1 = Math.atan2(p1.y - tp_screen.y, p1.x - tp_screen.x);
@@ -423,7 +546,7 @@
             if (deg1 < 0) deg1 += 360;
             drawLabel(ctx, deg1.toFixed(2) + '°', t1.color, tp_screen, arcRadius, angle1);
 
-            // BLUE ARC (Blue Goal, CW, Negative) - ORIGIN IS TURRET
+            // BLUE ARC (CW)
             const t2 = TARGETS[1];
             const p2 = toCanvasCoords(t2.x, t2.y);
             const angle2 = Math.atan2(p2.y - tp_screen.y, p2.x - tp_screen.x);
@@ -445,23 +568,20 @@
             let deg2 = -angle2 * (180 / Math.PI);
             drawLabel(ctx, deg2.toFixed(2) + '°', t2.color, tp_screen, arcRadius, angle2);
             
-            // --- Draw Dynamic Crosshair (Yellow) at TURRET Center ---
-            const pixelRadius = 12 * scale; 
+            // Crosshairs (Yellow) at TURRET
+            const pixelRadius = 24 * scale; 
             ctx.beginPath();
             ctx.strokeStyle = '#FFEB3B'; 
             ctx.lineWidth = 2;
-            // Use tp_screen instead of up
             ctx.moveTo(tp_screen.x - pixelRadius, tp_screen.y);
             ctx.lineTo(tp_screen.x + pixelRadius, tp_screen.y);
             ctx.moveTo(tp_screen.x, tp_screen.y - pixelRadius);
             ctx.lineTo(tp_screen.x, tp_screen.y + pixelRadius);
             ctx.stroke();
             
-            // Draw Lines and Distance Labels (From Turret)
+            // Lines & Labels
             TARGETS.forEach(t => {
                 const tp = toCanvasCoords(t.x, t.y);
-                
-                // Line from Turret to Goal
                 ctx.beginPath();
                 ctx.setLineDash([5, 5]); 
                 ctx.strokeStyle = t.color;
@@ -473,7 +593,6 @@
                 ctx.globalAlpha = 1.0;
                 ctx.setLineDash([]); 
 
-                // Distance Label calculation
                 const dist = Math.hypot(t.x - turretField.x, t.y - turretField.y);
                 const midX = (tp_screen.x + tp.x) / 2;
                 const midY = (tp_screen.y + tp.y) / 2;
@@ -492,15 +611,19 @@
                 ctx.restore();
             });
 
-            // Draw Robot Center Point (Yellow, smaller)
-            // Draw Turret Center Point (Yellow, larger for the crosshair origin)
-            ctx.beginPath();
-            ctx.arc(tp_screen.x, tp_screen.y, 5, 0, Math.PI * 2); 
+            // Dots
+            ctx.beginPath(); // Robot Center
+            ctx.arc(up.x, up.y, 4, 0, Math.PI * 2); 
             ctx.fillStyle = '#FFEB3B'; 
             ctx.strokeStyle = '#fff'; 
+            ctx.lineWidth = 1;
+            ctx.fill(); ctx.stroke();
+
+            ctx.beginPath(); // Turret Center
+            ctx.arc(tp_screen.x, tp_screen.y, 5, 0, Math.PI * 2); 
+            ctx.fillStyle = '#FFEB3B'; 
             ctx.lineWidth = 2;
-            ctx.fill();
-            ctx.stroke();
+            ctx.fill(); ctx.stroke();
         }
     }
 
@@ -534,11 +657,8 @@
         ctx.restore();
     }
 
-    // --- Data Calculation & Table Update ---
-
     function updateTable() {
         tableBody.innerHTML = '';
-        
         if (!userPoint) {
             posDisplay.textContent = "Click field to place point";
             posDisplay.style.color = "#777";
@@ -546,39 +666,33 @@
             return;
         }
 
-        posDisplay.textContent = `Center: (${userPoint.x.toFixed(1)}, ${userPoint.y.toFixed(1)})`;
+        posDisplay.textContent = `Robot Center: (${userPoint.x.toFixed(1)}, ${userPoint.y.toFixed(1)})`;
         posDisplay.style.color = "#4CAF50";
         
-        // --- UPDATED HEADING LOGIC ---
-        // Range: -180 to +180
-        // East = 0, North = +90, South = -90, West = +/-180
-        
-        // Normalize angle to 0 - 2PI first
         let normRad = robotHeading % (2 * Math.PI);
         if (normRad < 0) normRad += (2 * Math.PI);
-
-        // Convert to degrees (0 - 360)
         let deg = normRad * (180 / Math.PI);
-        
-        // Convert to -180 to +180 range
         if (deg > 180) deg -= 360;
+        headingDisplay.textContent = `Robot Heading: ${deg.toFixed(1)}°`;
         
-        headingDisplay.textContent = `Heading: ${deg.toFixed(1)}°`;
-        // -----------------------------
-        
-        // Calculate based on Turret Center
         const turretField = getTurretFieldPos();
 
         TARGETS.forEach((t, index) => {
             const dist = Math.hypot(t.x - turretField.x, t.y - turretField.y);
             const dx = t.x - turretField.x;
             const dy = t.y - turretField.y;
-            let angleDeg = Math.atan2(dy, dx) * (180 / Math.PI);
+            
+            let fieldAngleRad = Math.atan2(dy, dx);
+            let fieldAngleDeg = fieldAngleRad * (180 / Math.PI);
 
-            if (index === 0) { // Red Goal (CCW positive)
-                if (angleDeg < 0) angleDeg += 360;
+            let relRad = fieldAngleRad - robotHeading;
+            while (relRad <= -Math.PI) relRad += 2*Math.PI;
+            while (relRad > Math.PI) relRad -= 2*Math.PI;
+            let relDeg = relRad * (180 / Math.PI);
+
+            if (index === 0) { 
+                if (fieldAngleDeg < 0) fieldAngleDeg += 360;
             } 
-            // Blue Goal naturally returns negative for CW
 
             const tr = document.createElement('tr');
             tr.className = index === 0 ? 'target-row' : 'target-row-2';
@@ -592,10 +706,17 @@
             tdDist.textContent = dist.toFixed(2) + '"';
             tr.appendChild(tdDist);
 
-            const tdAngle = document.createElement('td');
-            tdAngle.className = 'data-val';
-            tdAngle.textContent = angleDeg.toFixed(2) + '°';
-            tr.appendChild(tdAngle);
+            const tdFieldAngle = document.createElement('td');
+            tdFieldAngle.className = 'data-val';
+            tdFieldAngle.textContent = fieldAngleDeg.toFixed(2) + '°';
+            tr.appendChild(tdFieldAngle);
+            
+            const tdRelAngle = document.createElement('td');
+            tdRelAngle.className = 'data-val';
+            tdRelAngle.style.color = '#fff';
+            const sign = relDeg >= 0 ? '+' : '';
+            tdRelAngle.textContent = sign + relDeg.toFixed(2) + '°';
+            tr.appendChild(tdRelAngle);
 
             tableBody.appendChild(tr);
         });
