@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FTC Auto Aiming Turret Tool</title>
+    <style>
+        :root {
+            --bg-color: #1e1e1e;
+            --text-color: #e0e0e0;
+            --accent-color: #00bcd4;
+            --user-color: #ffff00;   /* Yellow for user point */
+            --table-border: #333;
+            --field-border: #444;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none; /* Safari */
+        }
+
+        /* Layout */
+        .container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        .field-area {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background: #121212;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 380px;
+            background: #252526;
+            border-left: 1px solid var(--field-border);
+            display: flex;
+            flex-direction: column;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.5);
+            z-index: 10;
+        }
+
+        /* Field Wrapper */
+        #field-wrapper {
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            line-height: 0;
+        }
+
+        #field-img {
+            display: block;
+            max-width: 100%;
+            max-height: 90vh;
+            pointer-events: none;
+            user-drag: none;
+            -webkit-user-drag: none;
+        }
+
+        #field-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+            touch-action: none; /* Prevent browser scrolling on field */
+        }
+
+        /* SVG Elements */
+        .svg-point {
+            fill: var(--user-color);
+            stroke: white;
+            stroke-width: 2px;
+            cursor: grab;
+            transition: r 0.1s;
+        }
+        .svg-point:hover {
+            r: 10px;
+            fill: #fff;
+        }
+        .svg-point:active {
+            cursor: grabbing;
+        }
+        
+        /* User Crosshair */
+        .user-crosshair {
+            stroke: var(--user-color);
+            stroke-width: 1px;
+            opacity: 0.8;
+            pointer-events: none;
+        }
+
+        /* Hypotenuse */
+        .goal-line-red, .goal-line-blue {
+            stroke-width: 2px;
+            stroke-dasharray: 6, 4; 
+            opacity: 0.9;
+            pointer-events: none;
+        }
+        .goal-line-red { stroke: #ff4444; }
+        .goal-line-blue { stroke: #4444ff; }
+
+        /* Legs */
+        .leg-red, .leg-blue {
+            stroke-width: 2px;
+            stroke-dasharray: 6, 4;
+            opacity: 0.9;
+            pointer-events: none;
+        }
+        .leg-red { stroke: #ff4444; }
+        .leg-blue { stroke: #4444ff; }
+
+        /* Angle Arcs */
+        .angle-arc {
+            fill: none;
+            stroke-width: 2px;
+            opacity: 1.0;
+            pointer-events: none;
+        }
+        .ref-line {
+            stroke: #888;
+            stroke-width: 1px;
+            stroke-dasharray: 2, 2;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        /* TEXT STYLES - Increased to 16px */
+        .svg-text, .angle-text, .point-label-text, .goal-label-text {
+            font-size: 16px; 
+            font-weight: bold;
+            text-shadow: 1px 1px 2px black;
+            pointer-events: none;
+            text-anchor: middle; 
+            dominant-baseline: middle;
+        }
+        
+        .label-bg {
+            fill: rgba(0, 0, 0, 0.6); 
+            pointer-events: none;
+        }
+
+        /* Tooltip */
+        #tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            pointer-events: none;
+            display: none;
+            z-index: 100;
+            white-space: nowrap;
+        }
+
+        /* Sidebar Content */
+        .sidebar-header {
+            padding: 15px;
+            background: #333;
+            border-bottom: 1px solid var(--field-border);
+        }
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: var(--accent-color);
+        }
+        .sidebar-header p {
+            margin: 5px 0 0 0;
+            font-size: 0.85rem;
+            color: #aaa;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-top: 5px;
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+        .color-box {
+            width: 14px;
+            height: 14px;
+            margin-right: 8px;
+            display: inline-block;
+        }
+
+        .table-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 1rem;
+        }
+
+        th {
+            text-align: left;
+            border-bottom: 2px solid var(--accent-color);
+            padding: 10px;
+            color: #fff;
+            position: sticky;
+            top: 0;
+            background: #252526;
+            font-size: 0.9rem;
+        }
+
+        td {
+            border-bottom: 1px solid var(--table-border);
+            padding: 10px;
+            color: #ccc;
+        }
+
+        tr:hover td {
+            background: #333;
+            color: white;
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 800px) {
+            .container {
+                flex-direction: column;
+            }
+            .field-area {
+                flex: none; 
+                height: 60vh; 
+                padding: 10px;
+                background: #000;
+            }
+            #field-img {
+                max-height: 55vh; 
+            }
+            .sidebar {
+                width: 100%;
+                flex: 1; 
+                border-left: none;
+                border-top: 1px solid var(--field-border);
+                box-shadow: 0 -2px 10px rgba(0,0,0,0.5);
+            }
+            .sidebar-header {
+                padding: 10px;
+            }
+            /* Hide tooltip on touch devices */
+            #tooltip { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="field-area">
+        <div id="field-wrapper">
+            <img id="field-img" src="ftc-field.png" alt="FTC Field">
+            <svg id="field-svg"></svg>
+            <div id="tooltip"></div>
+        </div>
+    </div>
+
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>FTC Auto Aiming Turret Tool</h2>
+            <div style="margin-top: 8px;">
+                <div class="legend-item"><span class="color-box" style="background: #ff4444;"></span>Target: Red Goal (-62, 58)</div>
+                <div class="legend-item"><span class="color-box" style="background: #4444ff;"></span>Target: Blue Goal (-62, -58)</div>
+            </div>
+            <p style="margin-top:8px;">
+                • Angles from East (0°). Yellow Crosshair 12"x12".<br>
+                • Tap or Drag on field to aim.
+            </p>
+        </div>
+        <div class="table-container">
+            <table id="data-table">
+                <thead>
+                    <tr>
+                        <th>Goal</th>
+                        <th>Dist (in)</th>
+                        <th>Angle (deg)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Configuration
+    const FIELD_WIDTH_INCHES = 144;
+    const FIELD_HEIGHT_INCHES = 144;
+    
+    // Goal Coordinates
+    const RED_GOAL = { x: -62, y: 58 };
+    const BLUE_GOAL = { x: -62, y: -58 };
+    
+    // State
+    let points = []; 
+    let draggingPointIndex = -1;
+
+    // DOM Elements
+    const fieldImg = document.getElementById('field-img');
+    const svg = document.getElementById('field-svg');
+    const tooltip = document.getElementById('tooltip');
+    const tableBody = document.querySelector('#data-table tbody');
+
+    // --- Helpers ---
+
+    function getScale() {
+        const rect = fieldImg.getBoundingClientRect();
+        return rect.width / FIELD_WIDTH_INCHES;
+    }
+
+    function getEventPos(e) {
+        if (e.touches && e.touches.length > 0) {
+            return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        }
+        return { x: e.clientX, y: e.clientY };
+    }
+
+    function pixelsToInches(px, py) {
+        const rect = fieldImg.getBoundingClientRect();
+        const scale = getScale();
+        
+        const relX = px - rect.left;
+        const relY = py - rect.top;
+
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+
+        const fieldX = (relX - centerX) / scale;
+        const fieldY = -(relY - centerY) / scale; // Invert Y
+
+        return { x: fieldX, y: fieldY };
+    }
+
+    function inchesToPixels(fieldX, fieldY) {
+        const rect = fieldImg.getBoundingClientRect();
+        const scale = getScale();
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+
+        const relX = (fieldX * scale) + centerX;
+        const relY = centerY - (fieldY * scale); // Invert Y back
+
+        return { x: relX, y: relY }; 
+    }
+
+    // --- Rendering ---
+
+    function render() {
+        // Inject Marker Definitions
+        svg.innerHTML = `
+            <defs>
+                <marker id="arrow-red" viewBox="0 0 10 10" refX="8" refY="5"
+                    markerUnits="strokeWidth" markerWidth="6" markerHeight="6" orient="auto">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#ff4444" />
+                </marker>
+                 <marker id="arrow-blue" viewBox="0 0 10 10" refX="8" refY="5"
+                    markerUnits="strokeWidth" markerWidth="6" markerHeight="6" orient="auto">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#4444ff" />
+                </marker>
+            </defs>
+        `;
+
+        // Calculate Goal Pixel Locations
+        const redGoalPx = inchesToPixels(RED_GOAL.x, RED_GOAL.y);
+        const blueGoalPx = inchesToPixels(BLUE_GOAL.x, BLUE_GOAL.y);
+
+        // Draw Goal Markers (+)
+        drawCross(redGoalPx.x, redGoalPx.y, "#ff4444");
+        drawCross(blueGoalPx.x, blueGoalPx.y, "#4444ff");
+
+        // Draw Goal Labels (Increased spacing for larger text/markers)
+        drawGoalLabel(redGoalPx, "Red Goal", "#ff4444", -30); 
+        drawGoalLabel(blueGoalPx, "Blue Goal", "#4444ff", 30); 
+
+        if (points.length === 0) {
+            renderTable();
+            return;
+        }
+
+        const pt = points[0];
+        const ptPx = inchesToPixels(pt.x, pt.y);
+
+        // --- Calculate Data ---
+        const distRed = Math.hypot(RED_GOAL.x - pt.x, RED_GOAL.y - pt.y);
+        const distBlue = Math.hypot(BLUE_GOAL.x - pt.x, BLUE_GOAL.y - pt.y);
+
+        // Target Angles (From East/X+)
+        const angleRedDeg = Math.atan2(RED_GOAL.y - pt.y, RED_GOAL.x - pt.x) * (180 / Math.PI);
+        const angleBlueDeg = Math.atan2(BLUE_GOAL.y - pt.y, BLUE_GOAL.x - pt.x) * (180 / Math.PI);
+
+        // --- Draw Reference Line ---
+        const refEndPx = inchesToPixels(pt.x + 25, pt.y);
+        drawLine(ptPx, refEndPx, "ref-line");
+
+        // --- Triangle Corners ---
+        const cornerRedPx = inchesToPixels(pt.x, RED_GOAL.y);
+        const cornerBluePx = inchesToPixels(pt.x, BLUE_GOAL.y);
+
+        // --- Draw Red Geometry ---
+        drawLine(ptPx, cornerRedPx, "leg-red");
+        drawLine(redGoalPx, cornerRedPx, "leg-red");
+        drawLine(ptPx, redGoalPx, "goal-line-red");
+        
+        drawAngleArc(ptPx, 0, angleRedDeg, "#ff4444", "red"); 
+
+        // --- Draw Blue Geometry ---
+        drawLine(ptPx, cornerBluePx, "leg-blue");
+        drawLine(blueGoalPx, cornerBluePx, "leg-blue");
+        drawLine(ptPx, blueGoalPx, "goal-line-blue");
+        
+        drawAngleArc(ptPx, 0, angleBlueDeg, "#4444ff", "blue");
+
+        // --- Draw User 12x12 Crosshair ---
+        const crossRadius = 6; 
+        const crossTop = inchesToPixels(pt.x, pt.y + crossRadius);
+        const crossBottom = inchesToPixels(pt.x, pt.y - crossRadius);
+        const crossLeft = inchesToPixels(pt.x - crossRadius, pt.y);
+        const crossRight = inchesToPixels(pt.x + crossRadius, pt.y);
+
+        drawLine(crossTop, crossBottom, "user-crosshair");
+        drawLine(crossLeft, crossRight, "user-crosshair");
+
+
+        // --- Draw User Point Circle ---
+        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        circle.setAttribute("cx", ptPx.x);
+        circle.setAttribute("cy", ptPx.y);
+        circle.setAttribute("r", 10);
+        circle.setAttribute("class", "svg-point");
+        circle.dataset.index = 0;
+        
+        circle.addEventListener('mousedown', handleStart);
+        circle.addEventListener('touchstart', handleStart, {passive: false});
+        
+        svg.appendChild(circle);
+        
+        // --- Draw User Point Label ---
+        const labelText = `${pt.x.toFixed(1)}, ${pt.y.toFixed(1)}`;
+        const labelXOffset = -75; // Increased offset for wider box
+        const labelYOffset = 0; 
+        
+        // Background box (larger for 16px font)
+        const bgRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        const boxWidth = 100;
+        const boxHeight = 24;
+        bgRect.setAttribute("x", ptPx.x + labelXOffset - boxWidth/2);
+        bgRect.setAttribute("y", ptPx.y + labelYOffset - boxHeight/2);
+        bgRect.setAttribute("width", boxWidth);
+        bgRect.setAttribute("height", boxHeight);
+        bgRect.setAttribute("rx", 4);
+        bgRect.setAttribute("class", "label-bg"); 
+        svg.appendChild(bgRect);
+
+        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        text.setAttribute("x", ptPx.x + labelXOffset);
+        text.setAttribute("y", ptPx.y + labelYOffset + 1);
+        text.setAttribute("class", "point-label-text");
+        text.setAttribute("fill", "white");
+        text.textContent = labelText;
+        svg.appendChild(text);
+
+        renderTable(distRed, distBlue, angleRedDeg, angleBlueDeg);
+    }
+
+    // Helper to draw Goal Labels (Updated size)
+    function drawGoalLabel(centerPx, textStr, colorHex, yOffset) {
+        const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        const rectWidth = 90; // Wider
+        const rectHeight = 26; // Taller for 16px font
+
+        const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        rect.setAttribute("x", centerPx.x - (rectWidth/2));
+        rect.setAttribute("y", centerPx.y + yOffset - (rectHeight/2));
+        rect.setAttribute("width", rectWidth);
+        rect.setAttribute("height", rectHeight);
+        rect.setAttribute("rx", 4);
+        rect.setAttribute("class", "label-bg");
+
+        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        text.setAttribute("x", centerPx.x);
+        text.setAttribute("y", centerPx.y + yOffset + 1); 
+        text.setAttribute("class", "goal-label-text");
+        text.setAttribute("fill", colorHex);
+        text.textContent = textStr;
+
+        g.appendChild(rect);
+        g.appendChild(text);
+        svg.appendChild(g);
+    }
+
+    function drawLine(p1, p2, className) {
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", p1.x);
+        line.setAttribute("y1", p1.y);
+        line.setAttribute("x2", p2.x);
+        line.setAttribute("y2", p2.y);
+        line.setAttribute("class", className);
+        svg.appendChild(line);
+    }
+
+    function drawAngleArc(center, startAngleDeg, endAngleDeg, colorHex, colorName) {
+        const r = 35; 
+        const textRadius = 60; // Slightly further out for larger text
+        
+        const startSvg = -startAngleDeg;
+        const endSvg = -endAngleDeg;
+
+        const startX = center.x + r * Math.cos(startSvg * Math.PI / 180);
+        const startY = center.y + r * Math.sin(startSvg * Math.PI / 180);
+        
+        const endX = center.x + r * Math.cos(endSvg * Math.PI / 180);
+        const endY = center.y + r * Math.sin(endSvg * Math.PI / 180);
+
+        let diff = endSvg - startSvg;
+        while (diff <= -180) diff += 360;
+        while (diff > 180) diff -= 360;
+
+        const sweep = (diff > 0) ? 1 : 0;
+        const large = Math.abs(diff) > 180 ? 1 : 0;
+
+        const pathData = [
+            `M ${startX} ${startY}`,
+            `A ${r} ${r} 0 ${large} ${sweep} ${endX} ${endY}`
+        ].join(' ');
+
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        path.setAttribute("d", pathData);
+        path.setAttribute("class", "angle-arc");
+        path.setAttribute("stroke", colorHex);
+        path.setAttribute("marker-end", `url(#arrow-${colorName})`);
+        svg.appendChild(path);
+
+        const midSvg = startSvg + (diff / 2);
+        
+        const textX = center.x + textRadius * Math.cos(midSvg * Math.PI / 180);
+        const textY = center.y + textRadius * Math.sin(midSvg * Math.PI / 180);
+
+        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        text.setAttribute("x", textX);
+        text.setAttribute("y", textY);
+        text.setAttribute("class", "svg-text angle-text");
+        text.setAttribute("fill", colorHex); 
+        text.textContent = `${endAngleDeg.toFixed(2)}°`;
+        svg.appendChild(text);
+    }
+
+    // UPDATED: Draws a Plus (+) instead of X
+    function drawCross(x, y, color) {
+        const size = 10; // Slightly larger size for visibility
+        const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        g.setAttribute("stroke", color);
+        g.setAttribute("stroke-width", "3");
+        
+        // Vertical Line
+        const l1 = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        l1.setAttribute("x1", x); l1.setAttribute("y1", y - size);
+        l1.setAttribute("x2", x); l1.setAttribute("y2", y + size);
+
+        // Horizontal Line
+        const l2 = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        l2.setAttribute("x1", x - size); l2.setAttribute("y1", y);
+        l2.setAttribute("x2", x + size); l2.setAttribute("y2", y);
+
+        g.appendChild(l1);
+        g.appendChild(l2);
+        svg.appendChild(g);
+    }
+
+    function renderTable(distRed, distBlue, angleRed, angleBlue) {
+        tableBody.innerHTML = '';
+        
+        const rowRed = document.createElement('tr');
+        rowRed.innerHTML = `
+            <td style="color: #ff6666;">Red Goal</td>
+            <td>${distRed.toFixed(2)}</td>
+            <td>${angleRed.toFixed(2)}</td>
+        `;
+        tableBody.appendChild(rowRed);
+
+        const rowBlue = document.createElement('tr');
+        rowBlue.innerHTML = `
+            <td style="color: #6666ff;">Blue Goal</td>
+            <td>${distBlue.toFixed(2)}</td>
+            <td>${angleBlue.toFixed(2)}</td>
+        `;
+        tableBody.appendChild(rowBlue);
+    }
+
+    // --- Interaction Handlers ---
+
+    svg.addEventListener('mousemove', (e) => {
+        if (draggingPointIndex !== -1) return; 
+        if (window.matchMedia("(pointer: coarse)").matches) return;
+
+        const fieldCoords = pixelsToInches(e.clientX, e.clientY);
+        
+        tooltip.style.display = 'block';
+        tooltip.style.left = (e.clientX + 15) + 'px';
+        tooltip.style.top = (e.clientY + 15) + 'px';
+        tooltip.innerText = `X: ${fieldCoords.x.toFixed(1)}, Y: ${fieldCoords.y.toFixed(1)}`;
+    });
+
+    svg.addEventListener('mouseout', () => {
+        tooltip.style.display = 'none';
+    });
+
+    svg.addEventListener('mousedown', handleStart);
+    svg.addEventListener('touchstart', handleStart, {passive: false});
+
+    function handleStart(e) {
+        if (e.target.classList.contains('svg-point')) {
+             e.stopPropagation();
+             draggingPointIndex = 0;
+             e.target.style.fill = "#fff";
+        } else {
+            const pos = getEventPos(e);
+            const fieldCoords = pixelsToInches(pos.x, pos.y);
+            
+            points = [{
+                x: fieldCoords.x,
+                y: fieldCoords.y,
+                id: Date.now()
+            }];
+            draggingPointIndex = 0;
+            render();
+        }
+
+        if (e.type === 'touchstart') e.preventDefault();
+    }
+
+    window.addEventListener('mousemove', handleMove);
+    window.addEventListener('touchmove', handleMove, {passive: false});
+
+    function handleMove(e) {
+        if (draggingPointIndex !== -1) {
+            if (e.type === 'touchmove') e.preventDefault(); 
+
+            const pos = getEventPos(e);
+            const fieldCoords = pixelsToInches(pos.x, pos.y);
+            
+            const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
+            points[draggingPointIndex].x = clamp(fieldCoords.x, -72, 72);
+            points[draggingPointIndex].y = clamp(fieldCoords.y, -72, 72);
+            
+            render(); 
+        }
+    }
+
+    window.addEventListener('mouseup', handleEnd);
+    window.addEventListener('touchend', handleEnd);
+
+    function handleEnd() {
+        if (draggingPointIndex !== -1) {
+            draggingPointIndex = -1;
+            render(); 
+        }
+    }
+
+    window.addEventListener('resize', render);
+    fieldImg.onload = render;
+
+</script>
+
+</body>
+</html>
