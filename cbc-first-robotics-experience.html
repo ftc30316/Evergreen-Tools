@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The FIRST Robotics Experience | Columbia Basin College STEM Center</title>
+  <style>
+    :root {
+      --cbc-blue: #003e7e;
+      --cbc-blue-dark: #002b59;
+      --cbc-light-blue: #4aa3df;
+      --cbc-gold: #f2c94c;
+      --first-red: #ed1c24;
+      --text: #2f3437;
+      --muted: #65727c;
+      --light: #f4f7f9;
+      --white: #ffffff;
+      --border: #dbe4ea;
+      --shadow: 0 12px 30px rgba(0, 35, 70, 0.15);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.55;
+      background: var(--white);
+    }
+
+    a {
+      color: var(--cbc-blue);
+      text-decoration: none;
+    }
+
+    .top-strip {
+      background: var(--cbc-blue-dark);
+      color: white;
+      padding: 0.45rem 0;
+      font-size: 0.88rem;
+    }
+
+    .container {
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    .top-strip .container,
+    .main-nav .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .main-nav {
+      background: white;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 1rem 0;
+      font-weight: 800;
+      color: var(--cbc-blue);
+      letter-spacing: 0.02em;
+    }
+
+    .brand-mark {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--cbc-blue), var(--cbc-light-blue));
+      display: grid;
+      place-items: center;
+      color: white;
+      font-weight: 900;
+      box-shadow: var(--shadow);
+    }
+
+    nav ul {
+      display: flex;
+      align-items: center;
+      gap: 1.35rem;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .nav-cta {
+      background: var(--cbc-blue);
+      color: white;
+      padding: 0.65rem 1rem;
+      border-radius: 999px;
+    }
+
+    .hero {
+      min-height: 650px;
+      color: white;
+      display: grid;
+      place-items: center;
+      position: relative;
+      overflow: hidden;
+      background:
+        linear-gradient(90deg, rgba(0, 43, 89, 0.93) 0%, rgba(0, 62, 126, 0.77) 48%, rgba(0, 62, 126, 0.38) 100%),
+        radial-gradient(circle at 75% 22%, rgba(74, 163, 223, 0.85), transparent 28%),
+        linear-gradient(135deg, #053b77 0%, #0b68a8 58%, #e9f5fb 100%);
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: 0.18;
+      background-image:
+        linear-gradient(30deg, transparent 24%, rgba(255,255,255,0.35) 25%, rgba(255,255,255,0.35) 26%, transparent 27%, transparent 74%, rgba(255,255,255,0.35) 75%, rgba(255,255,255,0.35) 76%, transparent 77%),
+        linear-gradient(150deg, transparent 24%, rgba(255,255,255,0.25) 25%, rgba(255,255,255,0.25) 26%, transparent 27%, transparent 74%, rgba(255,255,255,0.25) 75%, rgba(255,255,255,0.25) 76%, transparent 77%);
+      background-size: 72px 72px;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      width: min(1180px, calc(100% - 40px));
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 3rem;
+      align-items: center;
+      padding: 5rem 0;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-weight: 800;
+      font-size: 0.82rem;
+      color: #dff3ff;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 34px;
+      height: 4px;
+      border-radius: 99px;
+      background: var(--cbc-gold);
+    }
+
+    h1 {
+      font-size: clamp(2.7rem, 6vw, 5.75rem);
+      line-height: 0.97;
+      letter-spacing: -0.05em;
+      margin: 1.1rem 0;
+    }
+
+    .hero p {
+      font-size: 1.28rem;
+      max-width: 660px;
+      color: #eef8ff;
+      margin-bottom: 2rem;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.9rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 0.9rem 1.25rem;
+      font-weight: 800;
+      border: 2px solid transparent;
+      transition: 0.18s ease;
+    }
+
+    .btn-primary {
+      background: var(--cbc-gold);
+      color: var(--cbc-blue-dark);
+    }
+
+    .btn-secondary {
+      color: white;
+      border-color: rgba(255,255,255,0.65);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 22px rgba(0,0,0,0.18);
+    }
+
+    .hero-card {
+      background: rgba(255,255,255,0.94);
+      color: var(--text);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 1.25rem;
+    }
+
+    .mock-photo {
+      min-height: 360px;
+      border-radius: 22px;
+      background:
+        linear-gradient(145deg, rgba(0,62,126,.08), rgba(74,163,223,.32)),
+        repeating-linear-gradient(90deg, rgba(0,62,126,.12) 0 2px, transparent 2px 48px),
+        repeating-linear-gradient(0deg, rgba(0,62,126,.08) 0 2px, transparent 2px 48px);
+      display: grid;
+      place-items: center;
+      padding: 2rem;
+      text-align: center;
+      border: 1px solid var(--border);
+    }
+
+    .robot-icon {
+      width: 180px;
+      height: 160px;
+      margin: 0 auto 1.1rem;
+      position: relative;
+    }
+
+    .robot-icon .body {
+      position: absolute;
+      left: 22px;
+      right: 22px;
+      bottom: 18px;
+      height: 86px;
+      border: 8px solid var(--cbc-blue);
+      border-radius: 16px;
+      background: white;
+    }
+
+    .robot-icon .head {
+      position: absolute;
+      left: 52px;
+      right: 52px;
+      top: 8px;
+      height: 56px;
+      border-radius: 16px;
+      background: var(--cbc-blue);
+    }
+
+    .robot-icon .eye {
+      position: absolute;
+      top: 27px;
+      width: 12px;
+      height: 12px;
+      background: var(--cbc-gold);
+      border-radius: 50%;
+    }
+
+    .robot-icon .eye.left { left: 73px; }
+    .robot-icon .eye.right { right: 73px; }
+
+    .robot-icon .wheel {
+      position: absolute;
+      bottom: 0;
+      width: 42px;
+      height: 42px;
+      background: var(--cbc-blue-dark);
+      border-radius: 50%;
+      border: 6px solid var(--cbc-light-blue);
+    }
+
+    .robot-icon .wheel.left { left: 16px; }
+    .robot-icon .wheel.right { right: 16px; }
+
+    .section {
+      padding: 5rem 0;
+    }
+
+    .section.alt {
+      background: var(--light);
+    }
+
+    .section-header {
+      max-width: 760px;
+      margin-bottom: 2.3rem;
+    }
+
+    .section-header.center {
+      margin-left: auto;
+      margin-right: auto;
+      text-align: center;
+    }
+
+    h2 {
+      color: var(--cbc-blue);
+      font-size: clamp(2rem, 3.3vw, 3.3rem);
+      letter-spacing: -0.035em;
+      line-height: 1.05;
+      margin: 0 0 1rem;
+    }
+
+    h3 {
+      color: var(--cbc-blue-dark);
+      margin: 0 0 0.65rem;
+      font-size: 1.32rem;
+    }
+
+    .lead {
+      color: var(--muted);
+      font-size: 1.18rem;
+    }
+
+    .grid {
+      display: grid;
+      gap: 1.35rem;
+    }
+
+    .grid-2 { grid-template-columns: repeat(2, 1fr); }
+    .grid-3 { grid-template-columns: repeat(3, 1fr); }
+    .grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+    .card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: 0 8px 22px rgba(0, 43, 89, 0.06);
+    }
+
+    .card-icon {
+      width: 54px;
+      height: 54px;
+      border-radius: 16px;
+      background: #e7f4fb;
+      color: var(--cbc-blue);
+      display: grid;
+      place-items: center;
+      font-size: 1.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .feature-card {
+      min-height: 330px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      position: relative;
+      overflow: hidden;
+      color: white;
+      border-radius: 24px;
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+      background:
+        linear-gradient(180deg, rgba(0,62,126,.05), rgba(0,43,89,.92)),
+        linear-gradient(135deg, #4aa3df, #003e7e);
+    }
+
+    .feature-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle at 20% 15%, rgba(255,255,255,.45), transparent 22%),
+                        radial-gradient(circle at 80% 25%, rgba(242,201,76,.5), transparent 16%);
+      opacity: 0.45;
+    }
+
+    .feature-card > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .feature-card h3 {
+      color: white;
+      font-size: 1.65rem;
+    }
+
+    .feature-card p {
+      color: #eef8ff;
+    }
+
+    .pill-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .pill {
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.32);
+      color: white;
+      border-radius: 999px;
+      padding: 0.35rem 0.65rem;
+      font-size: 0.86rem;
+      font-weight: 700;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+    }
+
+    .stat {
+      background: white;
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      border-top: 6px solid var(--cbc-light-blue);
+      box-shadow: 0 8px 22px rgba(0, 43, 89, 0.06);
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 2.2rem;
+      color: var(--cbc-blue);
+      line-height: 1;
+      margin-bottom: 0.45rem;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 3rem;
+      align-items: center;
+    }
+
+    .checklist {
+      list-style: none;
+      padding: 0;
+      margin: 1rem 0 0;
+    }
+
+    .checklist li {
+      padding: 0.55rem 0 0.55rem 2rem;
+      position: relative;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .checklist li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: var(--cbc-blue);
+      font-weight: 900;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 62px 1fr;
+      gap: 1rem;
+      align-items: start;
+    }
+
+    .step-number {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--cbc-blue);
+      color: white;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      font-size: 1.25rem;
+    }
+
+    .map-card {
+      background:
+        radial-gradient(circle at 20% 20%, rgba(74,163,223,.25), transparent 24%),
+        radial-gradient(circle at 80% 70%, rgba(242,201,76,.28), transparent 24%),
+        white;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 1.5rem;
+      min-height: 420px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .map-line {
+      position: absolute;
+      inset: 70px 45px 45px;
+      border: 4px dashed rgba(0,62,126,0.22);
+      border-radius: 54% 46% 52% 48%;
+      transform: rotate(-10deg);
+    }
+
+    .city {
+      position: absolute;
+      background: var(--cbc-blue);
+      color: white;
+      padding: 0.6rem 0.85rem;
+      border-radius: 999px;
+      font-weight: 800;
+      box-shadow: 0 8px 20px rgba(0,43,89,0.25);
+    }
+
+    .city.richland { left: 16%; top: 44%; }
+    .city.pasco { right: 18%; top: 36%; }
+    .city.kennewick { right: 28%; bottom: 24%; }
+
+    .quote {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--cbc-blue-dark);
+      border-left: 6px solid var(--cbc-gold);
+      padding-left: 1.25rem;
+      margin: 0;
+    }
+
+    .cta-band {
+      background: linear-gradient(135deg, var(--cbc-blue-dark), var(--cbc-blue));
+      color: white;
+      border-radius: 28px;
+      padding: 3rem;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 2rem;
+      align-items: center;
+      box-shadow: var(--shadow);
+    }
+
+    .cta-band h2 {
+      color: white;
+      margin-bottom: 0.6rem;
+    }
+
+    .cta-band p {
+      color: #dff3ff;
+      margin: 0;
+      font-size: 1.1rem;
+    }
+
+    footer {
+      background: var(--cbc-blue-dark);
+      color: white;
+      padding: 2.5rem 0;
+    }
+
+    footer p {
+      color: #dbefff;
+      max-width: 760px;
+    }
+
+    .note {
+      font-size: 0.92rem;
+      color: var(--muted);
+      margin-top: 1rem;
+    }
+
+    @media (max-width: 900px) {
+      .hero-content,
+      .split,
+      .cta-band {
+        grid-template-columns: 1fr;
+      }
+
+      .grid-2,
+      .grid-3,
+      .grid-4,
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      nav ul {
+        display: none;
+      }
+
+      .hero {
+        min-height: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="top-strip">
+    <div class="container">
+      <span>Columbia Basin College STEM Center</span>
+      <span>Pasco, Washington</span>
+    </div>
+  </div>
+
+  <header class="main-nav">
+    <div class="container">
+      <div class="brand">
+        <div class="brand-mark">CBC</div>
+        <div>
+          Columbia Basin College<br />
+          <span style="font-weight:600;color:#65727c;font-size:.9rem;">STEM Center</span>
+        </div>
+      </div>
+      <nav aria-label="Main navigation">
+        <ul>
+          <li><a href="#experience">Experience</a></li>
+          <li><a href="#educators">For Educators</a></li>
+          <li><a href="#community">Tri-Cities Robotics</a></li>
+          <li><a href="#visit" class="nav-cta">Plan a Visit</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-content">
+        <div>
+          <div class="eyebrow">Hands-on STEM for grades 5-12</div>
+          <h1>The FIRST Robotics Experience</h1>
+          <p>
+            Discover engineering, coding, teamwork, and innovation through interactive robotics experiences inspired by
+            FIRST LEGO League and FIRST Tech Challenge.
+          </p>
+          <div class="button-row">
+            <a class="btn btn-primary" href="#visit">Bring a School Group</a>
+            <a class="btn btn-secondary" href="#experience">Explore the Experience</a>
+          </div>
+        </div>
+
+        <div class="hero-card">
+          <div class="mock-photo" aria-label="Stylized robotics exhibit graphic">
+            <div>
+              <div class="robot-icon">
+                <div class="head"></div>
+                <div class="eye left"></div>
+                <div class="eye right"></div>
+                <div class="body"></div>
+                <div class="wheel left"></div>
+                <div class="wheel right"></div>
+              </div>
+              <h3>Build. Code. Drive. Innovate.</h3>
+              <p style="margin:0;color:#65727c;">
+                A STEM Center destination where students do more than see robotics — they try it.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="overview">
+      <div class="container split">
+        <div>
+          <div class="eyebrow" style="color:#003e7e;">A gateway into robotics</div>
+          <h2>Students can experience robotics today.</h2>
+          <p class="lead">
+            The FIRST Robotics Experience introduces students, families, and educators to real youth robotics programs
+            available throughout the Richland, Pasco, and Kennewick area.
+          </p>
+          <p>
+            Visitors explore simplified versions of FIRST LEGO League and FIRST Tech Challenge activities, interact with
+            robot fields and displays, and learn how to join or start local robotics teams.
+          </p>
+        </div>
+        <div class="card">
+          <blockquote class="quote">
+            “The goal is for every student to leave thinking: I could build that. I could code that. I could join a team.”
+          </blockquote>
+          <p class="note">
+            Concept mockup prepared as a proposed experience for the CBC STEM Center.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt">
+      <div class="container">
+        <div class="stats">
+          <div class="stat">
+            <strong>10,000+</strong>
+            <span>middle and high school student visitors to CBC each year</span>
+          </div>
+          <div class="stat">
+            <strong>5-12</strong>
+            <span>ideal grade range for hands-on robotics exploration</span>
+          </div>
+          <div class="stat">
+            <strong>2</strong>
+            <span>featured robotics pathways: FLL and FTC</span>
+          </div>
+          <div class="stat">
+            <strong>1</strong>
+            <span>clear next step: find or start a team</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="experience">
+      <div class="container">
+        <div class="section-header center">
+          <div class="eyebrow" style="color:#003e7e;">Explore the experience</div>
+          <h2>A hands-on robotics destination inside the STEM Center.</h2>
+          <p class="lead">
+            Each exhibit zone is designed to be approachable, memorable, and directly connected to real robotics
+            programs students can join.
+          </p>
+        </div>
+
+        <div class="grid grid-2">
+          <article class="feature-card">
+            <h3>FIRST LEGO League Zone</h3>
+            <p>
+              Students drive LEGO robots, run simplified missions on the current season's challenge table, and try
+              beginner-friendly coding activities.
+            </p>
+            <div class="pill-list">
+              <span class="pill">LEGO robot missions</span>
+              <span class="pill">Block coding</span>
+              <span class="pill">Team innovation</span>
+            </div>
+          </article>
+
+          <article class="feature-card">
+            <h3>FIRST Tech Challenge Zone</h3>
+            <p>
+              Visitors operate metal competition-style robots on a modified FTC field, score game pieces, and learn how
+              software, sensors, and strategy work together.
+            </p>
+            <div class="pill-list">
+              <span class="pill">Driver challenge</span>
+              <span class="pill">Java coding</span>
+              <span class="pill">Computer vision</span>
+            </div>
+          </article>
+
+          <article class="feature-card">
+            <h3>Engineering Design Studio</h3>
+            <p>
+              Interactive stations let students experiment with gears, robot arms, sensors, wheels, linkages, and
+              mechanical tradeoffs.
+            </p>
+            <div class="pill-list">
+              <span class="pill">Gears</span>
+              <span class="pill">Sensors</span>
+              <span class="pill">Robot arms</span>
+            </div>
+          </article>
+
+          <article class="feature-card">
+            <h3>Innovation Gallery</h3>
+            <p>
+              Local student projects show how robotics teams solve real-world problems through research, prototyping,
+              testing, and communication.
+            </p>
+            <div class="pill-list">
+              <span class="pill">Student inventions</span>
+              <span class="pill">Prototypes</span>
+              <span class="pill">Community impact</span>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt" id="interactive">
+      <div class="container">
+        <div class="section-header">
+          <div class="eyebrow" style="color:#003e7e;">What visitors can do</div>
+          <h2>Interactive activities designed for school field trips.</h2>
+          <p class="lead">
+            Activities can be experienced individually during public visits or as rotating stations during school group
+            visits.
+          </p>
+        </div>
+
+        <div class="grid grid-3">
+          <div class="card">
+            <div class="card-icon">🤖</div>
+            <h3>Drive a Robot</h3>
+            <p>Operate a simplified competition robot and score points on a student-friendly field challenge.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon">💻</div>
+            <h3>Code a Mission</h3>
+            <p>Use beginner programming activities to control robot movement, sensors, and autonomous actions.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon">⚙️</div>
+            <h3>Test Engineering Ideas</h3>
+            <p>Explore speed, torque, traction, mechanisms, and design choices through hands-on experiments.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon">👁️</div>
+            <h3>See Robot Vision</h3>
+            <p>Watch cameras, AprilTags, and object detection help robots understand the world around them.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon">🏆</div>
+            <h3>Follow the Competition</h3>
+            <p>View videos, scoring examples, trophies, and student stories from local robotics teams.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon">📍</div>
+            <h3>Find a Team</h3>
+            <p>Use a local team finder to connect students, parents, teachers, and mentors with robotics opportunities.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="educators">
+      <div class="container split">
+        <div>
+          <div class="eyebrow" style="color:#003e7e;">For educators</div>
+          <h2>A STEM field trip students will remember.</h2>
+          <p class="lead">
+            The FIRST Robotics Experience supports classroom learning by connecting science, technology, engineering,
+            math, communication, creativity, and career awareness.
+          </p>
+          <ul class="checklist">
+            <li>Designed for middle school and high school audiences</li>
+            <li>Supports STEM, CTE, career exploration, and enrichment goals</li>
+            <li>Works for classrooms, clubs, homeschool groups, and youth organizations</li>
+            <li>Connects students to local teams and ongoing participation</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>Suggested Visit Flow</h3>
+          <div class="timeline">
+            <div class="step">
+              <div class="step-number">1</div>
+              <div>
+                <strong>Welcome & Orientation</strong>
+                <p>Students learn what FIRST is and how robotics connects to STEM careers.</p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-number">2</div>
+              <div>
+                <strong>Hands-on Rotations</strong>
+                <p>Groups rotate through FLL, FTC, engineering, coding, and innovation stations.</p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-number">3</div>
+              <div>
+                <strong>Team Pathway</strong>
+                <p>Students leave with clear next steps to join, start, mentor, or support a robotics team.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt" id="community">
+      <div class="container split">
+        <div class="map-card">
+          <div class="map-line"></div>
+          <div class="city richland">Richland</div>
+          <div class="city pasco">Pasco</div>
+          <div class="city kennewick">Kennewick</div>
+        </div>
+        <div>
+          <div class="eyebrow" style="color:#003e7e;">Tri-Cities robotics</div>
+          <h2>Local students. Local teams. Real opportunities.</h2>
+          <p class="lead">
+            Robotics is already happening throughout the Tri-Cities. The STEM Center can become the regional front door
+            that helps students and families discover how to participate.
+          </p>
+          <div class="grid">
+            <div class="card">
+              <h3>For Students</h3>
+              <p>See what robotics looks like, try it for yourself, and find a program that fits your age and interests.</p>
+            </div>
+            <div class="card">
+              <h3>For Families</h3>
+              <p>Understand the benefits of robotics and learn how to support a student who wants to get involved.</p>
+            </div>
+            <div class="card">
+              <h3>For Community Partners</h3>
+              <p>Support workforce development by mentoring, sponsoring, volunteering, or helping launch teams.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="pathways">
+      <div class="container">
+        <div class="section-header center">
+          <div class="eyebrow" style="color:#003e7e;">Why robotics matters</div>
+          <h2>Robotics combines the skills students need for the future.</h2>
+        </div>
+
+        <div class="grid grid-4">
+          <div class="card">
+            <div class="card-icon">🧠</div>
+            <h3>Problem Solving</h3>
+            <p>Students iterate, test, fail, improve, and learn resilience.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon">🛠️</div>
+            <h3>Engineering</h3>
+            <p>Students design mechanisms, prototypes, and working systems.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon">⌨️</div>
+            <h3>Programming</h3>
+            <p>Students use code to make machines respond, sense, and act.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon">🤝</div>
+            <h3>Communication</h3>
+            <p>Students present ideas, document progress, and work as teams.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt" id="visit">
+      <div class="container">
+        <div class="cta-band">
+          <div>
+            <h2>Ready to bring students into robotics?</h2>
+            <p>
+              Plan a school group visit, explore STEM Center programming, or connect with local robotics opportunities
+              in the Richland, Pasco, and Kennewick area.
+            </p>
+          </div>
+          <div class="button-row">
+            <a class="btn btn-primary" href="mailto:stemcenter@columbiabasin.edu">Request Information</a>
+            <a class="btn btn-secondary" href="#community">Find Local Opportunities</a>
+          </div>
+        </div>
+
+        <p class="note">
+          This page is a concept mockup for discussion and planning. Replace placeholder contact links, exhibit details,
+          and imagery with approved CBC content before publication.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <strong>The FIRST Robotics Experience at Columbia Basin College STEM Center</strong>
+      <p>
+        A proposed hands-on STEM experience connecting students to engineering, coding, innovation, teamwork, and local
+        robotics pathways.
+      </p>
+    </div>
+  </footer>
+</body>
+</html>
