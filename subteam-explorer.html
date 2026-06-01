@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Evergreen Dynamics Subteam Explorer</title>
+  <style>
+    :root {
+      --forest: #123c2c;
+      --pine: #1f6b4a;
+      --mint: #d9f4df;
+      --sun: #f6c94c;
+      --sun-soft: #fff2bf;
+      --sky: #d7f3ff;
+      --ink: #17231d;
+      --muted: #5d6b63;
+      --paper: #f7fbf5;
+      --card: #ffffff;
+      --line: #dce8dd;
+      --shadow: 0 18px 45px rgba(18, 60, 44, 0.14);
+      --radius: 22px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(246, 201, 76, 0.22), transparent 34rem),
+        radial-gradient(circle at 80% 8%, rgba(82, 186, 125, 0.22), transparent 28rem),
+        linear-gradient(180deg, #fafff8 0%, var(--paper) 100%);
+      min-height: 100vh;
+    }
+
+    header {
+      position: relative;
+      overflow: hidden;
+      padding: 34px 20px 28px;
+      background: linear-gradient(135deg, var(--forest), #195d3d 58%, #2f8b5c);
+      color: white;
+    }
+
+    header::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(120deg, rgba(255,255,255,0.06) 1px, transparent 1px),
+        linear-gradient(60deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+      background-size: 42px 42px;
+      pointer-events: none;
+    }
+
+    .hero {
+      position: relative;
+      z-index: 1;
+      max-width: 1180px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 22px;
+      align-items: center;
+    }
+
+    .logo-wrap {
+      width: 92px;
+      height: 92px;
+      border-radius: 24px;
+      background: rgba(255,255,255,0.14);
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(255,255,255,0.22);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+      overflow: hidden;
+    }
+
+    .logo-wrap img {
+      width: 82px;
+      height: 82px;
+      object-fit: contain;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 5vw, 4.4rem);
+      line-height: 0.96;
+      margin: 0 0 12px;
+      letter-spacing: -0.055em;
+    }
+
+    .tagline {
+      margin: 0;
+      max-width: 800px;
+      color: rgba(255,255,255,0.86);
+      font-size: clamp(1rem, 2vw, 1.25rem);
+    }
+
+    .page {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 28px 20px 70px;
+    }
+
+    .intro-card {
+      margin-top: -16px;
+      position: relative;
+      z-index: 2;
+      background: var(--card);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+      padding: 24px;
+      display: grid;
+      grid-template-columns: 1.3fr 0.7fr;
+      gap: 20px;
+    }
+
+    .intro-card h2, .fit-panel h2, .compare h2 {
+      margin: 0 0 10px;
+      font-size: 1.45rem;
+      letter-spacing: -0.03em;
+    }
+
+    .intro-card p { margin: 0; color: var(--muted); line-height: 1.55; }
+
+    .quick-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .stat {
+      background: linear-gradient(180deg, #f4fbf6, #fff);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 1.7rem;
+      color: var(--pine);
+    }
+
+    .stat span { color: var(--muted); font-size: 0.85rem; }
+
+    .subteam-grid {
+      margin-top: 28px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .subteam-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: 0 12px 28px rgba(18, 60, 44, 0.08);
+      transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .subteam-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 7px;
+      background: var(--accent);
+    }
+
+    .subteam-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow);
+      border-color: rgba(31, 107, 74, 0.32);
+    }
+
+    .subteam-card h3 {
+      margin: 8px 0 4px;
+      font-size: 1.8rem;
+      letter-spacing: -0.045em;
+    }
+
+    .catchphrase {
+      display: inline-block;
+      font-weight: 800;
+      color: var(--forest);
+      background: var(--sun-soft);
+      border: 1px solid rgba(246, 201, 76, 0.45);
+      padding: 6px 10px;
+      border-radius: 999px;
+      margin-bottom: 12px;
+      font-size: 0.9rem;
+    }
+
+    .subteam-card p {
+      color: var(--muted);
+      line-height: 1.5;
+      margin: 0 0 14px;
+    }
+
+    .subteam-card ul {
+      padding-left: 20px;
+      margin: 0 0 16px;
+      color: #2c3d33;
+      line-height: 1.45;
+    }
+
+    .subteam-card li { margin: 7px 0; }
+
+    .skills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .chip {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--forest);
+      background: #eef8f1;
+      border: 1px solid #d9ecdd;
+      padding: 6px 9px;
+      border-radius: 999px;
+    }
+
+    .fit-panel, .compare {
+      margin-top: 28px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: 0 12px 28px rgba(18, 60, 44, 0.08);
+    }
+
+    .quiz-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .quiz-option {
+      border: 1px solid var(--line);
+      background: #fbfdfb;
+      border-radius: 16px;
+      padding: 14px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      cursor: pointer;
+    }
+
+    .quiz-option input { margin-top: 4px; }
+    .quiz-option span { color: var(--muted); font-size: 0.92rem; display: block; margin-top: 3px; }
+
+    .result {
+      margin-top: 18px;
+      padding: 18px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #f4fbf6, #fff7d8);
+      border: 1px solid #dce8dd;
+      display: none;
+    }
+
+    .result.visible { display: block; }
+    .result strong { color: var(--pine); }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+    }
+
+    th, td {
+      padding: 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+
+    th {
+      background: #eff8f1;
+      color: var(--forest);
+      font-size: 0.9rem;
+    }
+
+    tr:last-child td { border-bottom: none; }
+    td { color: var(--muted); }
+    td strong { color: var(--ink); }
+
+    .footer-note {
+      margin-top: 28px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+
+
+    .worksheet {
+      margin-top: 28px;
+      background: linear-gradient(180deg, #ffffff, #f8fcf8);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: 0 12px 28px rgba(18, 60, 44, 0.08);
+    }
+
+    .worksheet h2 {
+      margin: 0 0 10px;
+      font-size: 1.45rem;
+      letter-spacing: -0.03em;
+    }
+
+    .worksheet p {
+      color: var(--muted);
+      line-height: 1.55;
+      margin: 0 0 16px;
+    }
+
+    .student-name-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: end;
+      margin: 16px 0 20px;
+    }
+
+    .field label {
+      display: block;
+      font-weight: 800;
+      color: var(--forest);
+      margin-bottom: 6px;
+    }
+
+    .field input[type="text"] {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px 14px;
+      font: inherit;
+      background: white;
+      color: var(--ink);
+    }
+
+    .interest-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .interest-row {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+      background: #fbfdfb;
+      display: grid;
+      grid-template-columns: 170px 1fr 62px;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .interest-row h3 {
+      margin: 0 0 4px;
+      font-size: 1.25rem;
+      letter-spacing: -0.03em;
+    }
+
+    .interest-row .mini {
+      color: var(--muted);
+      font-size: 0.85rem;
+      line-height: 1.35;
+    }
+
+    .scale-wrap {
+      display: grid;
+      gap: 8px;
+    }
+
+    .scale-labels {
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+      gap: 8px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--pine);
+    }
+
+    .score-pill {
+      justify-self: end;
+      min-width: 54px;
+      text-align: center;
+      font-weight: 900;
+      color: var(--forest);
+      background: var(--sun-soft);
+      border: 1px solid rgba(246, 201, 76, 0.55);
+      padding: 9px 10px;
+      border-radius: 999px;
+    }
+
+    .summary-panel {
+      margin-top: 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .ranked-card, .copy-card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: white;
+      padding: 16px;
+    }
+
+    .ranked-card h3, .copy-card h3 {
+      margin: 0 0 12px;
+      color: var(--forest);
+    }
+
+    .ranked-list {
+      margin: 0;
+      padding-left: 22px;
+      color: #2c3d33;
+      line-height: 1.65;
+    }
+
+    textarea.summary-text {
+      width: 100%;
+      min-height: 230px;
+      resize: vertical;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      font: 0.95rem/1.45 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      color: var(--ink);
+      background: #fbfdfb;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 10px 14px;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      color: white;
+      background: var(--pine);
+      box-shadow: 0 8px 18px rgba(18, 60, 44, 0.16);
+    }
+
+    button.secondary {
+      color: var(--forest);
+      background: #eef8f1;
+      border: 1px solid #d9ecdd;
+      box-shadow: none;
+    }
+
+    .save-status {
+      color: var(--muted);
+      font-size: 0.86rem;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 920px) {
+      .intro-card { grid-template-columns: 1fr; }
+      .subteam-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .summary-panel { grid-template-columns: 1fr; }
+      .interest-row { grid-template-columns: 1fr; }
+      .score-pill { justify-self: start; }
+    }
+
+    @media (max-width: 640px) {
+      .hero { grid-template-columns: 1fr; text-align: center; }
+      .logo-wrap { margin: 0 auto; }
+      .subteam-grid, .quiz-grid { grid-template-columns: 1fr; }
+      .quick-stats, .student-name-row { grid-template-columns: 1fr; }
+      table, thead, tbody, th, td, tr { display: block; }
+      thead { display: none; }
+      tr { border-bottom: 1px solid var(--line); }
+      td { border-bottom: none; padding: 10px 14px; }
+      td::before { content: attr(data-label); display: block; font-weight: 800; color: var(--forest); margin-bottom: 4px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="hero">
+      <div class="logo-wrap">
+        <img src="ftc30316-logo.png" alt="Evergreen Dynamics FTC Team 30316 logo" />
+      </div>
+      <div>
+        <h1>Subteam Explorer</h1>
+        <p class="tagline">Find your place on Evergreen Dynamics. Learn what each subteam does, mark your interest levels, and copy a ranked summary to share with your coach.</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="page">
+    <section class="intro-card">
+      <div>
+        <h2>Choose a primary and secondary subteam</h2>
+        <p>Your primary subteam is where you will spend most of your time and take ownership. Your secondary subteam gives you a chance to learn something new, support teammates, and help the team stay flexible when schedules get busy. Use the worksheet below to rate every subteam, then share your ranked summary with your coach.</p>
+      </div>
+      <div class="quick-stats" aria-label="Subteam planning summary">
+        <div class="stat"><strong>6</strong><span>Subteams</span></div>
+        <div class="stat"><strong>1</strong><span>Primary</span></div>
+        <div class="stat"><strong>1</strong><span>Secondary</span></div>
+      </div>
+    </section>
+
+    <section class="subteam-grid" aria-label="Evergreen Dynamics subteams">
+      <article class="subteam-card" style="--accent:#2e8b57">
+        <h3>Strategy</h3>
+        <div class="catchphrase">Think first. Build smart.</div>
+        <p>Strategy studies the game and helps the team decide what the robot should do before we start designing or building.</p>
+        <ul>
+          <li>Analyze the game rules and scoring opportunities</li>
+          <li>Compare possible robot strategies and tradeoffs</li>
+          <li>Research successful FTC teams and match play</li>
+          <li>Create robot priorities and requirements</li>
+          <li>Help guide design decisions using data</li>
+        </ul>
+        <div class="skills"><span class="chip">Game analysis</span><span class="chip">Rules</span><span class="chip">Data</span><span class="chip">Decision making</span></div>
+      </article>
+
+      <article class="subteam-card" style="--accent:#f6c94c">
+        <h3>Design</h3>
+        <div class="catchphrase">From ideas to blueprints.</div>
+        <p>Design turns strategy into robot concepts, sketches, CAD models, prototypes, and plans the team can actually build.</p>
+        <ul>
+          <li>Create robot concepts and mechanism ideas</li>
+          <li>Learn CAD and build digital models</li>
+          <li>Plan prototypes and design experiments</li>
+          <li>Think through packaging and robot layout</li>
+          <li>Lead design reviews and improve ideas</li>
+        </ul>
+        <div class="skills"><span class="chip">CAD</span><span class="chip">Mechanisms</span><span class="chip">Creativity</span><span class="chip">Tradeoffs</span></div>
+      </article>
+
+      <article class="subteam-card" style="--accent:#4f8cc9">
+        <h3>Build</h3>
+        <div class="catchphrase">Make it real.</div>
+        <p>Build creates the physical robot: parts, assemblies, wiring, sensors, repairs, testing, and all the hands-on work.</p>
+        <ul>
+          <li>Manufacture, assemble, and repair robot parts</li>
+          <li>Wire motors, sensors, hubs, and batteries</li>
+          <li>Use tools, 3D printers, and hardware systems</li>
+          <li>Test prototypes and improve reliability</li>
+          <li>Keep the robot competition-ready</li>
+        </ul>
+        <div class="skills"><span class="chip">Tools</span><span class="chip">3D printing</span><span class="chip">Wiring</span><span class="chip">Testing</span></div>
+      </article>
+
+      <article class="subteam-card" style="--accent:#7f5af0">
+        <h3>Code</h3>
+        <div class="catchphrase">Bring the robot to life.</div>
+        <p>Code writes the software that makes the robot drive, aim, sense, think, and perform in autonomous and driver-controlled modes.</p>
+        <ul>
+          <li>Program the robot using Java and the FTC SDK</li>
+          <li>Create TeleOp controls and driver assists</li>
+          <li>Develop autonomous routines and path following</li>
+          <li>Experiment with sensors, vision, and telemetry</li>
+          <li>Debug and improve robot performance</li>
+        </ul>
+        <div class="skills"><span class="chip">Java</span><span class="chip">Autonomous</span><span class="chip">Vision</span><span class="chip">Debugging</span></div>
+      </article>
+
+      <article class="subteam-card" style="--accent:#ef7b45">
+        <h3>Outreach</h3>
+        <div class="catchphrase">Grow the team. Grow the community.</div>
+        <p>Outreach shares our team story, supports sponsors, mentors younger students, and helps Evergreen Dynamics make an impact beyond the robot.</p>
+        <ul>
+          <li>Plan community outreach and STEM events</li>
+          <li>Support sponsor communication and thank-yous</li>
+          <li>Mentor younger robotics teams</li>
+          <li>Create presentations and demonstrations</li>
+          <li>Track team impact and achievements</li>
+        </ul>
+        <div class="skills"><span class="chip">Leadership</span><span class="chip">Speaking</span><span class="chip">Mentoring</span><span class="chip">Events</span></div>
+      </article>
+
+      <article class="subteam-card" style="--accent:#151515">
+        <h3>Drive</h3>
+        <div class="catchphrase">Practice. Perform. Compete.</div>
+        <p>Drive prepares the team for competition by mastering the robot, practicing under pressure, scouting, and executing match strategy.</p>
+        <ul>
+          <li>Practice driving, operating, and human player skills</li>
+          <li>Develop match strategy and competition routines</li>
+          <li>Scout other teams and study match performance</li>
+          <li>Communicate with alliance partners</li>
+          <li>Help the team perform under pressure</li>
+        </ul>
+        <div class="skills"><span class="chip">Practice</span><span class="chip">Scouting</span><span class="chip">Pressure</span><span class="chip">Teamwork</span></div>
+      </article>
+    </section>
+
+    <section class="fit-panel">
+      <h2>Which subteams might fit you?</h2>
+      <p style="color:var(--muted); margin:0; line-height:1.55;">Check the statements that sound like you. This is not a final answer. It is just a way to start thinking about your primary and secondary choices.</p>
+      <div class="quiz-grid">
+        <label class="quiz-option"><input type="checkbox" data-team="Strategy"><div><strong>I like figuring out the smartest way to win.</strong><span>Rules, scoring, strategy, and tradeoffs sound interesting.</span></div></label>
+        <label class="quiz-option"><input type="checkbox" data-team="Design"><div><strong>I like imagining and designing solutions.</strong><span>Sketching, CAD, mechanisms, and robot layout sound fun.</span></div></label>
+        <label class="quiz-option"><input type="checkbox" data-team="Build"><div><strong>I like hands-on work.</strong><span>Tools, assembly, wiring, sensors, testing, and fixing things sound exciting.</span></div></label>
+        <label class="quiz-option"><input type="checkbox" data-team="Code"><div><strong>I like computers and problem solving.</strong><span>Programming, autonomous, vision, and debugging sound interesting.</span></div></label>
+        <label class="quiz-option"><input type="checkbox" data-team="Outreach"><div><strong>I like helping people connect with the team.</strong><span>Events, sponsors, mentoring, presentations, and storytelling sound meaningful.</span></div></label>
+        <label class="quiz-option"><input type="checkbox" data-team="Drive"><div><strong>I like competition and focused practice.</strong><span>Driving, scouting, match strategy, and performing under pressure sound fun.</span></div></label>
+      </div>
+      <div id="result" class="result"></div>
+    </section>
+
+
+    <section class="worksheet" aria-label="Subteam interest worksheet">
+      <h2>Subteam Interest Worksheet</h2>
+      <p>Mark your interest level for every subteam. You are not limited to only liking one or two areas. High scores mean “I would enjoy spending time here,” while lower scores simply mean “this is not my top area right now.” Your choices are saved in this browser automatically.</p>
+
+      <div class="student-name-row">
+        <div class="field">
+          <label for="studentName">Your name</label>
+          <input id="studentName" type="text" placeholder="Type your name" autocomplete="name" />
+        </div>
+        <button id="resetWorksheet" class="secondary" type="button">Reset worksheet</button>
+      </div>
+
+      <div class="interest-list" id="interestList"></div>
+
+      <div class="summary-panel">
+        <div class="ranked-card">
+          <h3>Your ranked interests</h3>
+          <ol id="rankedList" class="ranked-list"></ol>
+        </div>
+        <div class="copy-card">
+          <h3>Slack-ready summary</h3>
+          <textarea id="summaryText" class="summary-text" readonly aria-label="Copy and paste this summary to send to your coach in Slack"></textarea>
+          <div class="button-row">
+            <button id="copySummary" type="button">Copy summary</button>
+            <button id="downloadSummary" class="secondary" type="button">Download text</button>
+          </div>
+          <div id="saveStatus" class="save-status">Saved locally in this browser.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="compare">
+      <h2>Quick comparison</h2>
+      <table>
+        <thead>
+          <tr><th>Subteam</th><th>Big Question</th><th>You might like it if...</th></tr>
+        </thead>
+        <tbody>
+          <tr><td data-label="Subteam"><strong>Strategy</strong></td><td data-label="Big Question">What should the robot do?</td><td data-label="You might like it if">You like games, rules, data, and smart decisions.</td></tr>
+          <tr><td data-label="Subteam"><strong>Design</strong></td><td data-label="Big Question">How should the robot work?</td><td data-label="You might like it if">You like CAD, creativity, and solving engineering puzzles.</td></tr>
+          <tr><td data-label="Subteam"><strong>Build</strong></td><td data-label="Big Question">How do we make it real?</td><td data-label="You might like it if">You like tools, hardware, wiring, testing, and fixing things.</td></tr>
+          <tr><td data-label="Subteam"><strong>Code</strong></td><td data-label="Big Question">How do we make it move and think?</td><td data-label="You might like it if">You like programming, logic, sensors, and debugging.</td></tr>
+          <tr><td data-label="Subteam"><strong>Outreach</strong></td><td data-label="Big Question">How do we grow our impact?</td><td data-label="You might like it if">You like people, communication, mentoring, and events.</td></tr>
+          <tr><td data-label="Subteam"><strong>Drive</strong></td><td data-label="Big Question">How do we compete effectively?</td><td data-label="You might like it if">You like practice, pressure, competition, and teamwork.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <p class="footer-note">Evergreen Dynamics FTC Team 30316 · Rooted in curiosity. Growing one robot at a time.</p>
+  </main>
+
+  <script>
+    const inputs = document.querySelectorAll('input[data-team]');
+    const result = document.getElementById('result');
+
+    function updateResult() {
+      const counts = {};
+      inputs.forEach(input => {
+        if (input.checked) counts[input.dataset.team] = (counts[input.dataset.team] || 0) + 1;
+      });
+      const selected = Object.keys(counts);
+      if (!selected.length) {
+        result.classList.remove('visible');
+        result.innerHTML = '';
+        return;
+      }
+      const teams = selected.sort((a,b) => counts[b] - counts[a]);
+      const top = teams.slice(0, 3);
+      result.classList.add('visible');
+      result.innerHTML = `<strong>Your possible fit:</strong> ${top.join(', ')}<br><span style="color:#5d6b63">Use this as a starting point. A good primary subteam is one you want to own. A good secondary subteam is one you want to learn or support.</span>`;
+    }
+
+    inputs.forEach(input => input.addEventListener('change', updateResult));
+
+    const STORAGE_KEY = 'evergreen-dynamics-subteam-interest-v1';
+    const subteams = [
+      { name: 'Strategy', question: 'What should the robot do?' },
+      { name: 'Design', question: 'How should the robot do it?' },
+      { name: 'Build', question: 'How do we physically create it?' },
+      { name: 'Code', question: 'How do we make it move and think?' },
+      { name: 'Outreach', question: 'How do we grow our impact?' },
+      { name: 'Drive', question: 'How do we compete effectively?' }
+    ];
+
+    const studentName = document.getElementById('studentName');
+    const interestList = document.getElementById('interestList');
+    const rankedList = document.getElementById('rankedList');
+    const summaryText = document.getElementById('summaryText');
+    const copySummary = document.getElementById('copySummary');
+    const downloadSummary = document.getElementById('downloadSummary');
+    const resetWorksheet = document.getElementById('resetWorksheet');
+    const saveStatus = document.getElementById('saveStatus');
+
+    function defaultWorksheetState() {
+      return {
+        name: '',
+        scores: Object.fromEntries(subteams.map(team => [team.name, 3])),
+        updatedAt: new Date().toISOString()
+      };
+    }
+
+    function loadWorksheetState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return defaultWorksheetState();
+        const parsed = JSON.parse(raw);
+        const state = defaultWorksheetState();
+        state.name = typeof parsed.name === 'string' ? parsed.name : '';
+        for (const team of subteams) {
+          const value = Number(parsed.scores?.[team.name]);
+          state.scores[team.name] = Number.isFinite(value) ? Math.min(5, Math.max(1, Math.round(value))) : 3;
+        }
+        return state;
+      } catch (error) {
+        console.warn('Unable to load saved worksheet state.', error);
+        return defaultWorksheetState();
+      }
+    }
+
+    let worksheetState = loadWorksheetState();
+
+    function saveWorksheetState() {
+      worksheetState.updatedAt = new Date().toISOString();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(worksheetState));
+      saveStatus.textContent = 'Saved locally in this browser.';
+    }
+
+    function scoreLabel(score) {
+      return {
+        1: 'Not my thing',
+        2: 'A little interested',
+        3: 'Interested',
+        4: 'Very interested',
+        5: 'Extremely interested'
+      }[score] || 'Interested';
+    }
+
+    function getRankedTeams() {
+      return subteams
+        .map((team, index) => ({ ...team, score: worksheetState.scores[team.name], originalIndex: index }))
+        .sort((a, b) => b.score - a.score || a.originalIndex - b.originalIndex);
+    }
+
+    function renderInterestRows() {
+      interestList.innerHTML = subteams.map(team => {
+        const score = worksheetState.scores[team.name];
+        return `
+          <div class="interest-row">
+            <div>
+              <h3>${team.name}</h3>
+              <div class="mini">${team.question}</div>
+            </div>
+            <div class="scale-wrap">
+              <input type="range" min="1" max="5" step="1" value="${score}" data-interest-team="${team.name}" aria-label="${team.name} interest level" />
+              <div class="scale-labels"><span>1 Not much</span><span>3 Interested</span><span>5 Super interested</span></div>
+            </div>
+            <div class="score-pill" data-score-team="${team.name}">${score} / 5</div>
+          </div>
+        `;
+      }).join('');
+
+      interestList.querySelectorAll('input[data-interest-team]').forEach(input => {
+        input.addEventListener('input', event => {
+          const teamName = event.target.dataset.interestTeam;
+          worksheetState.scores[teamName] = Number(event.target.value);
+          const pill = document.querySelector(`[data-score-team="${teamName}"]`);
+          if (pill) pill.textContent = `${event.target.value} / 5`;
+          renderSummary();
+          saveWorksheetState();
+        });
+      });
+    }
+
+    function renderSummary() {
+      const ranked = getRankedTeams();
+      rankedList.innerHTML = ranked.map(team => `<li><strong>${team.name}</strong> — ${team.score}/5, ${scoreLabel(team.score)}</li>`).join('');
+
+      const nameLine = worksheetState.name.trim() ? `Name: ${worksheetState.name.trim()}` : 'Name: [student name]';
+      const topScore = ranked[0]?.score;
+      const topGroup = ranked.filter(team => team.score === topScore).map(team => team.name).join(', ');
+      const rankedLines = ranked.map((team, index) => `${index + 1}. ${team.name}: ${team.score}/5 - ${scoreLabel(team.score)}`).join('\n');
+
+      summaryText.value = `${nameLine}\nEvergreen Dynamics Subteam Interest Summary\n\nTop interest area(s): ${topGroup}\n\nRanked interest levels:\n${rankedLines}\n\nNotes: I am open to discussing primary and secondary subteam assignments based on team needs.`;
+    }
+
+    studentName.value = worksheetState.name;
+    studentName.addEventListener('input', event => {
+      worksheetState.name = event.target.value;
+      renderSummary();
+      saveWorksheetState();
+    });
+
+    copySummary.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(summaryText.value);
+        saveStatus.textContent = 'Copied summary to clipboard.';
+      } catch (error) {
+        summaryText.focus();
+        summaryText.select();
+        saveStatus.textContent = 'Select the text and copy it manually.';
+      }
+    });
+
+    downloadSummary.addEventListener('click', () => {
+      const safeName = (worksheetState.name.trim() || 'student').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      const blob = new Blob([summaryText.value], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `evergreen-dynamics-subteam-interest-${safeName}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    });
+
+    resetWorksheet.addEventListener('click', () => {
+      if (!confirm('Reset your saved subteam interest worksheet?')) return;
+      worksheetState = defaultWorksheetState();
+      studentName.value = '';
+      renderInterestRows();
+      renderSummary();
+      saveWorksheetState();
+    });
+
+    renderInterestRows();
+    renderSummary();
+    saveWorksheetState();
+  </script>
+</body>
+</html>
