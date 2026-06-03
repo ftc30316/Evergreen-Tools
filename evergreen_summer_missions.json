@@ -1,0 +1,86 @@
+[
+  {
+    "title": "Design a Parallel Plate Chassis",
+    "shortDescription": "Design and fabricate a complete FTC parallel plate drivetrain chassis to explore robot architecture and manufacturing techniques.",
+    "deliverable": "CAD model, fabricated side plates, and assembled rolling chassis",
+    "subteam": "Design"
+  },
+  {
+    "title": "Create a Quick Release Hardware Module",
+    "shortDescription": "Develop a standardized mounting system that allows robot subsystems to be quickly installed and removed.",
+    "deliverable": "Working quick-release module, mounting standard, and installation guide",
+    "subteam": "Design"
+  },
+  {
+    "title": "Build a Robot Cart",
+    "shortDescription": "Design and build a competition-ready cart for transporting and servicing the robot.",
+    "deliverable": "Finished robot cart with organized storage for tools, batteries, and parts",
+    "subteam": "Build"
+  },
+  {
+    "title": "Build a Linear Slide",
+    "shortDescription": "Build and evaluate a linear slide mechanism to learn about motion systems, rigidity, and load handling.",
+    "deliverable": "Working linear slide prototype and performance test results",
+    "subteam": "Build"
+  },
+  {
+    "title": "Build a Pollen Intake Prototype",
+    "shortDescription": "Design and test an intake mechanism capable of collecting and centering game pieces similar to pollen.",
+    "deliverable": "Working intake prototype and demonstration video",
+    "subteam": "Build"
+  },
+  {
+    "title": "Detect AprilTags with Limelight",
+    "shortDescription": "Use a Limelight camera to detect and track AprilTags for robot localization and targeting.",
+    "deliverable": "Working FTC code demonstrating AprilTag detection and telemetry output",
+    "subteam": "Code"
+  },
+  {
+    "title": "Learn Autonomous with RoadRunner and MeepMeep",
+    "shortDescription": "Learn to create and simulate FTC autonomous paths using RoadRunner and MeepMeep.",
+    "deliverable": "Autonomous routine running on the robot and corresponding MeepMeep simulation",
+    "subteam": "Code"
+  },
+  {
+    "title": "Create a Sensor Test Suite",
+    "shortDescription": "Write a robot test program that checks key sensors and reports whether each sensor is connected, reading correctly, and ready for use.",
+    "deliverable": "FTC OpMode that tests sensors and displays clear telemetry results",
+    "subteam": "Code"
+  },
+  {
+    "title": "Analyze Winning FTC Autonomous Routines",
+    "shortDescription": "Study successful FTC autonomous routines to identify common pathing, scoring, timing, and reliability strategies.",
+    "deliverable": "Presentation with examples, patterns, and recommendations for Evergreen Dynamics autonomous planning",
+    "subteam": "Strategy"
+  },
+  {
+    "title": "Analyze Driving Techniques from Top FTC Teams",
+    "shortDescription": "Study elite FTC match footage to identify driving techniques, positioning strategies, and operational best practices.",
+    "deliverable": "Presentation summarizing key findings and recommendations for Evergreen Dynamics drivers",
+    "subteam": "Drive"
+  },
+  {
+    "title": "Create a Driver Skills Combine",
+    "shortDescription": "Design two driving challenges that help team members practice precision, speed, control, and consistency.",
+    "deliverable": "Two driver challenges, scoring system, and team leaderboard",
+    "subteam": "Drive"
+  },
+  {
+    "title": "Create an Evergreen Dynamics Team Website",
+    "shortDescription": "Build a website that showcases the team, its mission, outreach activities, sponsors, and accomplishments.",
+    "deliverable": "Published team website with core content and navigation",
+    "subteam": "Outreach"
+  },
+  {
+    "title": "Conduct a Branch Out 50/50 Meeting with an FTC Team",
+    "shortDescription": "Connect with another FTC team to exchange ideas, learn best practices, and strengthen collaboration as part of the Branch Out 50/50 initiative.",
+    "deliverable": "Completed team meeting, meeting notes, and summary of lessons learned",
+    "subteam": "Outreach"
+  },
+  {
+    "title": "Create Sponsorship Requests for Benton REA and Cadwell Industries",
+    "shortDescription": "Prepare customized sponsorship request materials for Benton REA and Cadwell Industries that explain the team, funding needs, and community impact.",
+    "deliverable": "Two sponsor-ready request letters or sponsorship packets customized for Benton REA and Cadwell Industries",
+    "subteam": "Outreach"
+  }
+]
