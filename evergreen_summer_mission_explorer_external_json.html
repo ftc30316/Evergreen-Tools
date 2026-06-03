@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Evergreen Dynamics Summer Mission Explorer</title>
+  <style>
+    :root {
+      --green: #0b3d2e;
+      --green-2: #125c43;
+      --yellow: #f6c945;
+      --cyan: #23c7d9;
+      --silver: #e7ecef;
+      --ink: #10211b;
+      --card: #ffffff;
+      --muted: #5d6b66;
+      --shadow: 0 14px 35px rgba(0, 0, 0, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(35, 199, 217, 0.28), transparent 34rem),
+        linear-gradient(135deg, #09281f 0%, #0b3d2e 45%, #071c17 100%);
+      min-height: 100vh;
+    }
+
+    header {
+      color: white;
+      padding: 2rem 1rem 1.5rem;
+      text-align: center;
+    }
+
+    .brand-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .logo {
+      width: 88px;
+      height: 88px;
+      object-fit: contain;
+      background: rgba(255,255,255,0.12);
+      border-radius: 18px;
+      padding: 0.5rem;
+      border: 1px solid rgba(255,255,255,0.22);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 5vw, 4rem);
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+
+    .subtitle {
+      margin: 0.8rem auto 0;
+      max-width: 780px;
+      color: #d9fff5;
+      font-size: 1.08rem;
+    }
+
+    .resource-note {
+      margin: 1rem auto 0;
+      max-width: 820px;
+      color: #fff5c6;
+      font-size: 0.95rem;
+    }
+
+    main {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 1rem;
+    }
+
+    .panel {
+      background: rgba(255, 255, 255, 0.94);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255,255,255,0.45);
+      overflow: hidden;
+    }
+
+    .toolbar {
+      padding: 1rem;
+      background: linear-gradient(90deg, rgba(246,201,69,0.22), rgba(35,199,217,0.12));
+      display: grid;
+      gap: 0.8rem;
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+    }
+
+    button, .copy-button {
+      border: 0;
+      border-radius: 999px;
+      padding: 0.7rem 1rem;
+      cursor: pointer;
+      font-weight: 800;
+      color: var(--green);
+      background: var(--silver);
+      transition: transform 0.12s ease, background 0.12s ease;
+    }
+
+    button:hover, .copy-button:hover {
+      transform: translateY(-1px);
+    }
+
+    button.active {
+      color: #05231a;
+      background: var(--yellow);
+    }
+
+    .summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      color: var(--muted);
+      font-size: 0.93rem;
+    }
+
+    .pill {
+      background: white;
+      border: 1px solid #dbe5e0;
+      border-radius: 999px;
+      padding: 0.4rem 0.7rem;
+      font-weight: 700;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 360px;
+      gap: 1rem;
+      padding: 1rem;
+    }
+
+    @media (max-width: 900px) {
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .mission-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1rem;
+      align-content: start;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid #dce8e3;
+      border-radius: 20px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      min-height: 260px;
+    }
+
+    .card h2 {
+      font-size: 1.16rem;
+      line-height: 1.18;
+      margin: 0;
+      color: var(--green);
+    }
+
+    .subteam-tag {
+      display: inline-flex;
+      align-self: flex-start;
+      background: #e9f7f1;
+      color: var(--green-2);
+      border: 1px solid #c8e9dc;
+      border-radius: 999px;
+      padding: 0.35rem 0.65rem;
+      font-size: 0.78rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .label {
+      font-size: 0.72rem;
+      font-weight: 900;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.2rem;
+    }
+
+    .card p {
+      margin: 0;
+      line-height: 1.42;
+    }
+
+    .favorite-row {
+      margin-top: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .favorite-button {
+      width: 100%;
+      border-radius: 14px;
+      background: #f2f5f3;
+    }
+
+    .favorite-button.selected {
+      background: var(--yellow);
+    }
+
+    aside {
+      background: #f8fbfa;
+      border: 1px solid #dce8e3;
+      border-radius: 20px;
+      padding: 1rem;
+      position: sticky;
+      top: 1rem;
+      align-self: start;
+    }
+
+    aside h2 {
+      margin: 0 0 0.75rem;
+      color: var(--green);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 240px;
+      border: 1px solid #cbd8d3;
+      border-radius: 14px;
+      padding: 0.8rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.9rem;
+      resize: vertical;
+      background: white;
+      color: #10211b;
+    }
+
+    .copy-button {
+      width: 100%;
+      margin-top: 0.75rem;
+      background: var(--green);
+      color: white;
+      border-radius: 14px;
+    }
+
+    .json-link {
+      display: inline-block;
+      margin-top: 0.75rem;
+      color: var(--green);
+      font-weight: 800;
+    }
+
+    .empty {
+      padding: 2rem;
+      background: white;
+      border-radius: 18px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    footer {
+      color: #c9fff3;
+      text-align: center;
+      padding: 1.5rem 1rem 2rem;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand-row">
+      <img src="ftc30316-logo.png" alt="Evergreen Dynamics FTC 30316 logo" class="logo" />
+      <div>
+        <h1>Summer Mission Explorer</h1>
+        <p class="subtitle">Browse Evergreen Dynamics summer missions by subteam, pick your favorites, and copy a Slack-ready message.</p>
+      </div>
+    </div>
+    <p class="resource-note">Mission data is loaded from a separate JSON resource: <strong>evergreen_summer_missions.json</strong></p>
+  </header>
+
+  <main>
+    <section class="panel">
+      <div class="toolbar">
+        <div class="filters" id="filters"></div>
+        <div class="summary" id="summary"></div>
+      </div>
+
+      <div class="content-grid">
+        <section>
+          <div class="mission-grid" id="missions"></div>
+        </section>
+
+        <aside>
+          <h2>Slack Ready Summary</h2>
+          <p>Select your favorite missions. This message will update automatically.</p>
+          <textarea id="slackMessage" readonly></textarea>
+          <button class="copy-button" onclick="copySlackMessage()">Copy Slack Message</button>
+          <a class="json-link" href="evergreen_summer_missions.json" target="_blank" rel="noopener">Open mission JSON</a>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Evergreen Dynamics FTC 30316 · Where innovation never wilts
+  </footer>
+
+  <script>
+    const DATA_URL = "evergreen_summer_missions.json";
+    const subteamOrder = ["Strategy", "Design", "Build", "Code", "Drive", "Outreach"];
+    let missions = [];
+    let currentFilter = "All";
+    let favorites = new Set();
+
+    async function loadMissions() {
+      try {
+        const response = await fetch(DATA_URL);
+        if (!response.ok) {
+          throw new Error(`Could not load ${DATA_URL}`);
+        }
+        missions = await response.json();
+        renderFilters();
+        renderSummary();
+        renderMissions();
+        updateSlackMessage();
+      } catch (error) {
+        document.getElementById("missions").innerHTML = `
+          <div class="empty">
+            <strong>Mission data could not be loaded.</strong><br>
+            Make sure this HTML file is in the same folder as <code>${DATA_URL}</code>.
+          </div>
+        `;
+        document.getElementById("slackMessage").value =
+          `Mission data could not be loaded. Make sure ${DATA_URL} is in the same folder as this HTML page.`;
+      }
+    }
+
+    function getSubteams() {
+      const found = new Set(missions.map(m => m.subteam));
+      return subteamOrder.filter(s => found.has(s));
+    }
+
+    function renderFilters() {
+      const filters = document.getElementById("filters");
+      const subteams = ["All", ...getSubteams()];
+      filters.innerHTML = subteams.map(team => `
+        <button class="${team === currentFilter ? "active" : ""}" onclick="setFilter('${team}')">
+          ${team}
+        </button>
+      `).join("");
+    }
+
+    function renderSummary() {
+      const summary = document.getElementById("summary");
+      const counts = getSubteams().map(team => {
+        const count = missions.filter(m => m.subteam === team).length;
+        return `<span class="pill">${team}: ${count}</span>`;
+      }).join("");
+      summary.innerHTML = `<span class="pill">Total: ${missions.length}</span>${counts}`;
+    }
+
+    function setFilter(team) {
+      currentFilter = team;
+      renderFilters();
+      renderMissions();
+    }
+
+    function renderMissions() {
+      const container = document.getElementById("missions");
+      const visible = currentFilter === "All"
+        ? missions
+        : missions.filter(m => m.subteam === currentFilter);
+
+      if (visible.length === 0) {
+        container.innerHTML = `<div class="empty">No missions found for this subteam.</div>`;
+        return;
+      }
+
+      container.innerHTML = visible.map((mission) => {
+        const index = missions.indexOf(mission);
+        const selected = favorites.has(index);
+        return `
+          <article class="card">
+            <span class="subteam-tag">${mission.subteam}</span>
+            <h2>${mission.title}</h2>
+            <div>
+              <div class="label">Description</div>
+              <p>${mission.shortDescription}</p>
+            </div>
+            <div>
+              <div class="label">Deliverable</div>
+              <p>${mission.deliverable}</p>
+            </div>
+            <div class="favorite-row">
+              <button class="favorite-button ${selected ? "selected" : ""}" onclick="toggleFavorite(${index})">
+                ${selected ? "★ Selected Favorite" : "☆ Select Favorite"}
+              </button>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function toggleFavorite(index) {
+      if (favorites.has(index)) {
+        favorites.delete(index);
+      } else {
+        favorites.add(index);
+      }
+      renderMissions();
+      updateSlackMessage();
+    }
+
+    function updateSlackMessage() {
+      const selected = [...favorites].map(i => missions[i]);
+      const textarea = document.getElementById("slackMessage");
+
+      if (selected.length === 0) {
+        textarea.value =
+`Hi team! Here are the summer missions I am most interested in:
+
+No favorites selected yet.
+
+I am still reviewing the mission options.`;
+        return;
+      }
+
+      const lines = selected.map(m =>
+        `• *${m.title}* (${m.subteam}) — ${m.deliverable}`
+      ).join("\n");
+
+      textarea.value =
+`Hi team! Here are the summer missions I am most interested in:
+
+${lines}
+
+I would be excited to help with these because they seem useful for the upcoming FTC season.`;
+    }
+
+    async function copySlackMessage() {
+      const text = document.getElementById("slackMessage").value;
+      try {
+        await navigator.clipboard.writeText(text);
+        alert("Slack message copied!");
+      } catch (error) {
+        const textarea = document.getElementById("slackMessage");
+        textarea.select();
+        document.execCommand("copy");
+        alert("Slack message copied!");
+      }
+    }
+
+    loadMissions();
+  </script>
+</body>
+</html>
