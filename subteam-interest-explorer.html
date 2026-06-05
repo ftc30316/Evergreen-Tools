@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Evergreen Dynamics Subteam Interest Explorer</title>
+  <title>Evergreen Dynamics Subteam Interest Explorer v3</title>
   <style>
     :root {
       --green:#0b3d2e; --green2:#146b4a; --yellow:#f7c948; --cyan:#37d5d6; --silver:#e5e7eb;
@@ -19,11 +19,11 @@
   </style>
 </head>
 <body>
-<header><div class="hero"><img src="ftc30316-logo.png" class="logo" alt="Evergreen Dynamics logo" onerror="this.style.display='none'"/><div><div class="badge">FTC #30316 · BIOBUZZ 2026/2027</div><div class="title">Subteam Interest Explorer</div><div class="subtitle">Explore student interests, subteam coverage, and where Evergreen Dynamics may need to balance the team structure.</div></div></div></header>
+<header><div class="hero"><img src="ftc30316-logo.png?v=3" class="logo" alt="Evergreen Dynamics logo" onerror="this.style.display='none'"/><div><div class="badge">FTC #30316 · BIOBUZZ 2026/2027</div><div class="title">Subteam Interest Explorer</div><div class="subtitle">Explore student interests, subteam coverage, and where Evergreen Dynamics may need to balance the team structure.</div></div></div></header>
 <main>
   <section class="controls">
     <label class="control">Subteam <select id="subteamFilter"><option value="All">All</option></select></label>
-    <label class="control">Minimum score <select id="minScore"><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option></select></label>
+    <label class="control">Minimum score <select id="minScore"><option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option></select></label>
     <label class="control">Student <select id="studentFilter"><option value="All">All</option></select></label>
   </section>
   <section class="grid">
@@ -32,6 +32,7 @@
     <div class="card half"><h2>Balance Notes</h2><div id="recommendations"></div></div>
     <div class="card twoThird"><h2>Student Interest Matrix</h2><div style="overflow-x:auto"><table id="matrix"></table></div></div>
     <div class="card third"><h2>Selected View</h2><div id="selectedDetails" class="hint">Choose a student or subteam to explore details.</div></div>
+    <div class="card"><h2>Subteam Membership at Threshold</h2><div class="hint">Students listed in each subteam have scores at or above the selected minimum, ranked by score.</div><div id="membershipView"></div></div>
     <div class="card"><h2>Student Cards</h2><div class="studentCards" id="studentCards"></div></div>
   </section>
 </main><footer>Evergreen Dynamics · Where innovation never wilts.</footer>
@@ -54,12 +55,24 @@ const $ = id => document.getElementById(id);
 function init(){ subteams.forEach(s=> $('subteamFilter').innerHTML += `<option>${s}</option>`); students.forEach(s=> $('studentFilter').innerHTML += `<option>${s.name}</option>`); ['subteamFilter','minScore','studentFilter'].forEach(id=>$(id).addEventListener('change', render)); render(); }
 function counts(min){ return Object.fromEntries(subteams.map(t=>[t, students.filter(s=>s[t]>=min).length])); }
 function avg(t){ return (students.reduce((a,s)=>a+s[t],0)/students.length).toFixed(1); }
-function render(){ const min=+$('minScore').value, filter=$('subteamFilter').value, stu=$('studentFilter').value; renderKpis(min); renderBars(min,filter); renderRecs(min); renderMatrix(min,filter,stu); renderCards(min,filter,stu); renderDetails(min,filter,stu); }
+function render(){ const min=+$('minScore').value, filter=$('subteamFilter').value, stu=$('studentFilter').value; renderKpis(min); renderBars(min,filter); renderRecs(min); renderMatrix(min,filter,stu); renderMembership(min,filter); renderCards(min,filter,stu); renderDetails(min,filter,stu); }
 function renderKpis(min){ const c=counts(min); const strongest=Object.entries(c).sort((a,b)=>b[1]-a[1])[0]; const weakest=Object.entries(c).sort((a,b)=>a[1]-b[1])[0]; $('kpis').innerHTML=`<div class="kpi"><b>${students.length}</b><span>Students</span></div><div class="kpi"><b>${strongest[0]}</b><span>Most coverage: ${strongest[1]}</span></div><div class="kpi"><b>${weakest[0]}</b><span>Least coverage: ${weakest[1]}</span></div><div class="kpi"><b>${min}+</b><span>Current interest threshold</span></div>`; }
 function renderBars(min,filter){ const c=counts(min); $('coverageBars').innerHTML=subteams.filter(t=>filter==='All'||filter===t).map(t=>{let cls=c[t]>ideal[t][1]?'high':c[t]<ideal[t][0]?'low':'warn'; return `<div class="barRow ${cls}"><b>${t}</b><div class="bar"><div class="fill" style="width:${c[t]/students.length*100}%"></div></div><span>${c[t]}/10</span></div><div class="small">Avg ${avg(t)} · target coverage ${ideal[t][0]}-${ideal[t][1]}</div>`}).join(''); }
 function renderRecs(min){ const c=counts(min); $('recommendations').innerHTML=subteams.map(t=>{ if(c[t]>ideal[t][1]) return `<div class="rec problem"><b>${t} may be crowded.</b> ${c[t]} students meet the threshold. Consider primary/secondary roles or rotating tasks.</div>`; if(c[t]<ideal[t][0]) return `<div class="rec lowNeed"><b>${t} needs coverage.</b> Only ${c[t]} student(s) meet the threshold. Recruit support or pair with adjacent work.</div>`; return `<div class="rec"><b>${t} looks balanced.</b> ${c[t]} students meet the threshold.</div>`}).join(''); }
 function scoreClass(v,min){return v>=5?'score style="color:var(--yellow)"':v>=min?'score style="color:var(--cyan)"':'score style="color:var(--muted)"'}
 function renderMatrix(min,filter,stu){ let rows=students.filter(s=>stu==='All'||s.name===stu); let cols=subteams.filter(t=>filter==='All'||filter===t); $('matrix').innerHTML=`<thead><tr><th>Name</th>${cols.map(t=>`<th>${t}</th>`).join('')}<th>Top</th></tr></thead><tbody>${rows.map(s=>`<tr><td><b>${s.name}</b></td>${cols.map(t=>`<td ${scoreClass(s[t],min)}>${s[t]}</td>`).join('')}<td>${s.top.map(x=>`<span class="pill">${x}</span>`).join('')}</td></tr>`).join('')}</tbody>`; }
+
+function renderMembership(min,filter){
+  const teams = subteams.filter(t=>filter==='All'||filter===t);
+  $('membershipView').innerHTML = `<div class="studentCards">${teams.map(t=>{
+    const members = students
+      .filter(s=>s[t]>=min)
+      .sort((a,b)=>b[t]-a[t] || a.name.localeCompare(b.name));
+    const status = members.length>ideal[t][1] ? 'Crowded' : members.length<ideal[t][0] ? 'Needs coverage' : 'Balanced';
+    return `<div class="student"><div class="name">${t}</div><div class="small">${status} · ${members.length} student(s) at ${min}+</div>${members.length ? members.map(s=>`<div class="mini"><span>${s.name}</span><div class="miniBar"><div class="miniFill" style="width:${s[t]*20}%"></div></div><b>${s[t]}</b></div>`).join('') : '<p class="hint">No students meet the current threshold.</p>'}</div>`;
+  }).join('')}</div>`;
+}
+
 function renderCards(min,filter,stu){ $('studentCards').innerHTML=students.filter(s=>stu==='All'||s.name===stu).map(s=>`<div class="student ${stu===s.name?'active':''}" onclick="document.getElementById('studentFilter').value='${s.name}'; render();"><div class="name">${s.name}</div><div class="small">Top: ${s.top.join(', ')}</div>${subteams.filter(t=>filter==='All'||filter===t).map(t=>`<div class="mini"><span>${t}</span><div class="miniBar"><div class="miniFill" style="width:${s[t]*20}%"></div></div><b>${s[t]}</b></div>`).join('')}</div>`).join(''); }
 function renderDetails(min,filter,stu){ if(stu!=='All'){ const s=students.find(x=>x.name===stu); $('selectedDetails').innerHTML=`<h3>${s.name}</h3><p>Highest interest: ${s.top.map(x=>`<span class="pill">${x}</span>`).join('')}</p><p>Best fits at ${min}+ threshold: ${subteams.filter(t=>s[t]>=min).map(t=>`<span class="pill">${t} ${s[t]}</span>`).join('')||'None at current threshold'}</p>`; return; } if(filter!=='All'){ const list=students.filter(s=>s[filter]>=min).sort((a,b)=>b[filter]-a[filter]); $('selectedDetails').innerHTML=`<h3>${filter}</h3><p>Average score: <b>${avg(filter)}</b></p><p>Students at ${min}+:</p>${list.map(s=>`<div class="pill">${s.name} ${s[filter]}</div>`).join('')||'<p>No students at current threshold.</p>'}`; return;} $('selectedDetails').innerHTML='Use the filters to focus on one student or one subteam.'; }
 init();
