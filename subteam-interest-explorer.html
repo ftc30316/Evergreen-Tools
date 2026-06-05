@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Evergreen Dynamics Subteam Interest Explorer</title>
+  <style>
+    :root {
+      --green:#0b3d2e; --green2:#146b4a; --yellow:#f7c948; --cyan:#37d5d6; --silver:#e5e7eb;
+      --bg:#071c16; --card:#102820; --card2:#17372d; --text:#f4f7f5; --muted:#b9c8c0; --danger:#ff8a80;
+    }
+    *{box-sizing:border-box} body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:radial-gradient(circle at top left,#14553e 0,#071c16 45%,#04110d 100%);color:var(--text)}
+    header{padding:28px 24px 18px;border-bottom:1px solid rgba(255,255,255,.08);background:linear-gradient(135deg,rgba(11,61,46,.96),rgba(7,28,22,.88))}
+    .hero{max-width:1200px;margin:auto;display:flex;gap:20px;align-items:center}.logo{width:86px;height:86px;object-fit:contain;background:white;border-radius:18px;padding:8px}.badge{color:var(--yellow);font-weight:800;letter-spacing:.08em;text-transform:uppercase;font-size:.8rem}.title{font-size:clamp(2rem,5vw,4rem);font-weight:900;line-height:1;margin:6px 0}.subtitle{color:var(--muted);font-size:1.05rem;max-width:850px}
+    main{max-width:1200px;margin:auto;padding:22px}.controls{display:flex;gap:12px;flex-wrap:wrap;margin:18px 0 24px}.control{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:10px 12px;color:var(--text)}select,input{background:#0c211b;color:var(--text);border:1px solid rgba(255,255,255,.2);border-radius:10px;padding:9px}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}.card{grid-column:span 12;background:linear-gradient(180deg,rgba(23,55,45,.98),rgba(13,34,27,.98));border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:18px;box-shadow:0 12px 40px rgba(0,0,0,.22)}@media(min-width:820px){.half{grid-column:span 6}.third{grid-column:span 4}.twoThird{grid-column:span 8}}
+    h2{margin:0 0 14px;font-size:1.25rem}.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}.kpi{background:rgba(255,255,255,.07);border-radius:14px;padding:14px;border:1px solid rgba(255,255,255,.08)}.kpi b{display:block;font-size:2rem;color:var(--yellow)}.kpi span{color:var(--muted);font-size:.9rem}
+    table{width:100%;border-collapse:collapse;overflow:hidden;border-radius:12px}th,td{text-align:left;padding:10px;border-bottom:1px solid rgba(255,255,255,.08)}th{color:var(--yellow);font-size:.82rem;text-transform:uppercase;letter-spacing:.04em}tr:hover{background:rgba(255,255,255,.06)}.score{font-weight:800}.pill{display:inline-block;border:1px solid rgba(255,255,255,.18);padding:4px 8px;border-radius:999px;margin:2px;background:rgba(55,213,214,.12)}
+    .bars{display:flex;flex-direction:column;gap:12px}.barRow{display:grid;grid-template-columns:96px 1fr 52px;gap:10px;align-items:center}.bar{height:26px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden}.fill{height:100%;background:linear-gradient(90deg,var(--green2),var(--cyan));border-radius:999px}.warn .fill{background:linear-gradient(90deg,#b45309,var(--yellow))}.low .fill{background:linear-gradient(90deg,#7f1d1d,var(--danger))}.high .fill{background:linear-gradient(90deg,var(--green2),var(--yellow))}.hint{color:var(--muted);font-size:.9rem}.studentCards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}.student{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:14px;cursor:pointer}.student.active{outline:3px solid var(--yellow)}.name{font-weight:900;font-size:1.2rem}.mini{display:grid;grid-template-columns:70px 1fr 24px;gap:7px;align-items:center;margin-top:7px;font-size:.85rem}.miniBar{height:8px;background:rgba(255,255,255,.1);border-radius:999px;overflow:hidden}.miniFill{height:100%;background:var(--cyan)}.rec{padding:10px;border-radius:12px;margin:8px 0;background:rgba(255,255,255,.06);border-left:4px solid var(--cyan)}.rec.problem{border-left-color:var(--yellow)}.rec.lowNeed{border-left-color:var(--danger)}footer{text-align:center;color:var(--muted);padding:30px}.small{font-size:.82rem;color:var(--muted)}
+  </style>
+</head>
+<body>
+<header><div class="hero"><img src="ftc30316-logo.png" class="logo" alt="Evergreen Dynamics logo" onerror="this.style.display='none'"/><div><div class="badge">FTC #30316 · BIOBUZZ 2026/2027</div><div class="title">Subteam Interest Explorer</div><div class="subtitle">Explore student interests, subteam coverage, and where Evergreen Dynamics may need to balance the team structure.</div></div></div></header>
+<main>
+  <section class="controls">
+    <label class="control">Subteam <select id="subteamFilter"><option value="All">All</option></select></label>
+    <label class="control">Minimum score <select id="minScore"><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option></select></label>
+    <label class="control">Student <select id="studentFilter"><option value="All">All</option></select></label>
+  </section>
+  <section class="grid">
+    <div class="card"><h2>Team Snapshot</h2><div class="kpis" id="kpis"></div></div>
+    <div class="card half"><h2>Subteam Coverage</h2><div class="hint">Coverage counts students with interest at or above the selected minimum score.</div><div class="bars" id="coverageBars"></div></div>
+    <div class="card half"><h2>Balance Notes</h2><div id="recommendations"></div></div>
+    <div class="card twoThird"><h2>Student Interest Matrix</h2><div style="overflow-x:auto"><table id="matrix"></table></div></div>
+    <div class="card third"><h2>Selected View</h2><div id="selectedDetails" class="hint">Choose a student or subteam to explore details.</div></div>
+    <div class="card"><h2>Student Cards</h2><div class="studentCards" id="studentCards"></div></div>
+  </section>
+</main><footer>Evergreen Dynamics · Where innovation never wilts.</footer>
+<script>
+const subteams = ['Design','Build','Code','Drive','Strategy','Outreach'];
+const students = [
+ {name:'Lucy', Design:5, Build:4, Code:2, Drive:3, Strategy:1, Outreach:4, top:['Design']},
+ {name:'Adi', Design:1, Build:3, Code:5, Drive:4, Strategy:2, Outreach:4, top:['Code']},
+ {name:'Sami', Design:3, Build:4, Code:1, Drive:5, Strategy:2, Outreach:5, top:['Outreach','Drive']},
+ {name:'Bianca', Design:4, Build:1, Code:5, Drive:2, Strategy:2, Outreach:3, top:['Code']},
+ {name:'Aadhya', Design:2, Build:4, Code:1, Drive:3, Strategy:5, Outreach:4, top:['Strategy','Outreach']},
+ {name:'Samuel', Design:5, Build:5, Code:2, Drive:4, Strategy:3, Outreach:1, top:['Build']},
+ {name:'Leo', Design:3, Build:4, Code:5, Drive:3, Strategy:3, Outreach:2, top:['Code']},
+ {name:'Easton', Design:5, Build:5, Code:3, Drive:3, Strategy:4, Outreach:2, top:['Design','Build','Drive']},
+ {name:'Krithi', Design:4, Build:4, Code:5, Drive:2, Strategy:2, Outreach:2, top:['Code']},
+ {name:'Isaac', Design:2, Build:4, Code:1, Drive:5, Strategy:4, Outreach:2, top:['Drive']}
+];
+const ideal = {Design:[2,4], Build:[3,5], Code:[3,5], Drive:[2,3], Strategy:[2,3], Outreach:[2,4]};
+const $ = id => document.getElementById(id);
+function init(){ subteams.forEach(s=> $('subteamFilter').innerHTML += `<option>${s}</option>`); students.forEach(s=> $('studentFilter').innerHTML += `<option>${s.name}</option>`); ['subteamFilter','minScore','studentFilter'].forEach(id=>$(id).addEventListener('change', render)); render(); }
+function counts(min){ return Object.fromEntries(subteams.map(t=>[t, students.filter(s=>s[t]>=min).length])); }
+function avg(t){ return (students.reduce((a,s)=>a+s[t],0)/students.length).toFixed(1); }
+function render(){ const min=+$('minScore').value, filter=$('subteamFilter').value, stu=$('studentFilter').value; renderKpis(min); renderBars(min,filter); renderRecs(min); renderMatrix(min,filter,stu); renderCards(min,filter,stu); renderDetails(min,filter,stu); }
+function renderKpis(min){ const c=counts(min); const strongest=Object.entries(c).sort((a,b)=>b[1]-a[1])[0]; const weakest=Object.entries(c).sort((a,b)=>a[1]-b[1])[0]; $('kpis').innerHTML=`<div class="kpi"><b>${students.length}</b><span>Students</span></div><div class="kpi"><b>${strongest[0]}</b><span>Most coverage: ${strongest[1]}</span></div><div class="kpi"><b>${weakest[0]}</b><span>Least coverage: ${weakest[1]}</span></div><div class="kpi"><b>${min}+</b><span>Current interest threshold</span></div>`; }
+function renderBars(min,filter){ const c=counts(min); $('coverageBars').innerHTML=subteams.filter(t=>filter==='All'||filter===t).map(t=>{let cls=c[t]>ideal[t][1]?'high':c[t]<ideal[t][0]?'low':'warn'; return `<div class="barRow ${cls}"><b>${t}</b><div class="bar"><div class="fill" style="width:${c[t]/students.length*100}%"></div></div><span>${c[t]}/10</span></div><div class="small">Avg ${avg(t)} · target coverage ${ideal[t][0]}-${ideal[t][1]}</div>`}).join(''); }
+function renderRecs(min){ const c=counts(min); $('recommendations').innerHTML=subteams.map(t=>{ if(c[t]>ideal[t][1]) return `<div class="rec problem"><b>${t} may be crowded.</b> ${c[t]} students meet the threshold. Consider primary/secondary roles or rotating tasks.</div>`; if(c[t]<ideal[t][0]) return `<div class="rec lowNeed"><b>${t} needs coverage.</b> Only ${c[t]} student(s) meet the threshold. Recruit support or pair with adjacent work.</div>`; return `<div class="rec"><b>${t} looks balanced.</b> ${c[t]} students meet the threshold.</div>`}).join(''); }
+function scoreClass(v,min){return v>=5?'score style="color:var(--yellow)"':v>=min?'score style="color:var(--cyan)"':'score style="color:var(--muted)"'}
+function renderMatrix(min,filter,stu){ let rows=students.filter(s=>stu==='All'||s.name===stu); let cols=subteams.filter(t=>filter==='All'||filter===t); $('matrix').innerHTML=`<thead><tr><th>Name</th>${cols.map(t=>`<th>${t}</th>`).join('')}<th>Top</th></tr></thead><tbody>${rows.map(s=>`<tr><td><b>${s.name}</b></td>${cols.map(t=>`<td ${scoreClass(s[t],min)}>${s[t]}</td>`).join('')}<td>${s.top.map(x=>`<span class="pill">${x}</span>`).join('')}</td></tr>`).join('')}</tbody>`; }
+function renderCards(min,filter,stu){ $('studentCards').innerHTML=students.filter(s=>stu==='All'||s.name===stu).map(s=>`<div class="student ${stu===s.name?'active':''}" onclick="document.getElementById('studentFilter').value='${s.name}'; render();"><div class="name">${s.name}</div><div class="small">Top: ${s.top.join(', ')}</div>${subteams.filter(t=>filter==='All'||filter===t).map(t=>`<div class="mini"><span>${t}</span><div class="miniBar"><div class="miniFill" style="width:${s[t]*20}%"></div></div><b>${s[t]}</b></div>`).join('')}</div>`).join(''); }
+function renderDetails(min,filter,stu){ if(stu!=='All'){ const s=students.find(x=>x.name===stu); $('selectedDetails').innerHTML=`<h3>${s.name}</h3><p>Highest interest: ${s.top.map(x=>`<span class="pill">${x}</span>`).join('')}</p><p>Best fits at ${min}+ threshold: ${subteams.filter(t=>s[t]>=min).map(t=>`<span class="pill">${t} ${s[t]}</span>`).join('')||'None at current threshold'}</p>`; return; } if(filter!=='All'){ const list=students.filter(s=>s[filter]>=min).sort((a,b)=>b[filter]-a[filter]); $('selectedDetails').innerHTML=`<h3>${filter}</h3><p>Average score: <b>${avg(filter)}</b></p><p>Students at ${min}+:</p>${list.map(s=>`<div class="pill">${s.name} ${s[filter]}</div>`).join('')||'<p>No students at current threshold.</p>'}`; return;} $('selectedDetails').innerHTML='Use the filters to focus on one student or one subteam.'; }
+init();
+</script>
+</body>
+</html>
