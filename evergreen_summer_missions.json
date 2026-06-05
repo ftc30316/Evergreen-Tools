@@ -1,5 +1,24 @@
 [
   {
+    "title": "Plan Outreach for the Benton Franklin Fair",
+    "shortDescription": "Develop a complete outreach plan for Evergreen Dynamics' participation at the Benton Franklin Fair, including booth activities, displays, volunteer schedules, and visitor engagement ideas.",
+    "deliverable": "Fair outreach plan, booth layout, activity list, volunteer schedule, and setup checklist",
+    "subteam": "Outreach"
+  },
+  {
+    "title": "Create a Team Budgeting System",
+    "shortDescription": "Design a system for tracking team income, expenses, sponsorships, fundraising goals, and season spending to help Evergreen Dynamics manage finances effectively.",
+    "deliverable": "Budget spreadsheet, expense tracking process, and financial summary dashboard",
+    "subteam": "Strategy"
+  },
+  {
+    "title": "Plan a STEM Camp",
+    "shortDescription": "Develop a plan for a future STEM camp that introduces younger students to robotics, engineering, and FIRST programs through engaging hands-on activities.",
+    "deliverable": "Camp agenda, activity plans, supply list, budget estimate, and marketing flyer",
+    "subteam": "Outreach"
+  },
+
+  {
     "title": "Design a Parallel Plate Chassis",
     "shortDescription": "Design and fabricate a complete FTC parallel plate drivetrain chassis to explore robot architecture and manufacturing techniques.",
     "deliverable": "CAD model, fabricated side plates, and assembled rolling chassis",
