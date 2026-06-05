@@ -82,5 +82,11 @@
     "shortDescription": "Prepare customized sponsorship request materials for Benton REA and Cadwell Industries that explain the team, funding needs, and community impact.",
     "deliverable": "Two sponsor-ready request letters or sponsorship packets customized for Benton REA and Cadwell Industries",
     "subteam": "Outreach"
+  },
+  {
+  "title": "Develop a Robot State Machine Demo",
+  "shortDescription": "Create a robot program that uses a state machine to control a multi-step task. The robot should transition between states such as waiting, driving, detecting an object, performing an action, and reporting completion. The goal is to learn how state machines simplify complex robot behavior.",
+  "deliverable": "Working FTC OpMode, state diagram, and live demonstration showing the robot progressing through multiple states with telemetry indicating the current state",
+  "subteam": "Code"
   }
 ]
