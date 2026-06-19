@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agnesi Hub</title>
+  <style>
+    :root {
+      --first-blue: #0066b3;
+      --first-red: #ed1c24;
+      --dark-blue: #001f3f;
+      --light-blue: #eaf4ff;
+      --orange: #f57c00;
+      --text: #111827;
+      --muted: #5b6472;
+      --border: #d7e0ea;
+      --card: #ffffff;
+      --bg: #f6f8fb;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    header {
+      background: linear-gradient(90deg, var(--dark-blue), var(--first-blue));
+      color: white;
+      padding: 18px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: 0 3px 12px rgba(0,0,0,.18);
+    }
+
+    .nav {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 900;
+      letter-spacing: .5px;
+      font-size: 1.25rem;
+    }
+
+    .triangle-logo {
+      width: 38px;
+      height: 30px;
+      position: relative;
+    }
+    .triangle-logo::before {
+      content: "";
+      position: absolute;
+      inset: 2px 12px 2px 0;
+      border: 4px solid white;
+      transform: rotate(45deg);
+    }
+    .triangle-logo::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      top: 5px;
+      width: 20px;
+      height: 20px;
+      border: 4px solid var(--first-red);
+      border-radius: 50%;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin-left: 18px;
+      font-weight: 700;
+      font-size: .88rem;
+    }
+
+    .hero {
+      background: white;
+      border-bottom: 5px solid var(--first-red);
+    }
+
+    .hero-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 54px 24px;
+      display: grid;
+      grid-template-columns: 1.25fr .75fr;
+      gap: 36px;
+      align-items: center;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(3rem, 7vw, 5.6rem);
+      line-height: .9;
+      color: var(--dark-blue);
+      font-weight: 900;
+      letter-spacing: -3px;
+      text-transform: uppercase;
+    }
+
+    .subtitle {
+      font-size: clamp(1.25rem, 3vw, 2rem);
+      color: var(--first-blue);
+      font-weight: 800;
+      margin: 0 0 18px;
+    }
+
+    .hero p { max-width: 620px; font-size: 1.05rem; }
+
+    .button-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; }
+    .btn {
+      display: inline-block;
+      padding: 13px 20px;
+      border-radius: 8px;
+      color: white;
+      text-decoration: none;
+      font-weight: 800;
+      background: var(--first-red);
+      box-shadow: 0 5px 14px rgba(237,28,36,.25);
+    }
+    .btn.blue { background: var(--first-blue); box-shadow: 0 5px 14px rgba(0,102,179,.25); }
+
+    .hero-card {
+      background: linear-gradient(145deg, var(--dark-blue), #073e78);
+      color: white;
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 12px 30px rgba(0,0,0,.22);
+    }
+    .hero-card h2 { margin-top: 0; color: white; }
+    .quick-list { padding-left: 18px; margin-bottom: 0; }
+    .quick-list li { margin: 8px 0; }
+
+    main { max-width: 1100px; margin: 0 auto; padding: 32px 24px 56px; }
+    section {
+      margin: 28px 0;
+      scroll-margin-top: 90px;
+    }
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--dark-blue);
+      text-transform: uppercase;
+      font-size: 1.7rem;
+      margin-bottom: 16px;
+    }
+    .number {
+      background: var(--first-blue);
+      color: white;
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: 900;
+    }
+
+    .grid { display: grid; gap: 18px; }
+    .grid.three { grid-template-columns: repeat(3, 1fr); }
+    .grid.two { grid-template-columns: repeat(2, 1fr); }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px;
+      box-shadow: 0 4px 16px rgba(0,0,0,.05);
+    }
+    .card h3 { margin-top: 0; color: var(--first-blue); }
+    .red h3 { color: var(--first-red); }
+    .orange h3 { color: var(--orange); }
+
+    .icon {
+      font-size: 2.2rem;
+      margin-bottom: 8px;
+    }
+
+    .qr-placeholder {
+      width: 160px;
+      height: 160px;
+      background:
+        linear-gradient(90deg, #111 8px, transparent 8px) 0 0/24px 24px,
+        linear-gradient(#111 8px, transparent 8px) 0 0/24px 24px,
+        white;
+      border: 8px solid white;
+      outline: 2px solid #cbd5e1;
+      margin: 18px auto;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--first-blue);
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .chat-wrap {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      background: #101820;
+      color: white;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid #2d3748;
+      box-shadow: 0 14px 30px rgba(0,0,0,.25);
+    }
+    .members {
+      background: #0b1220;
+      padding: 20px;
+      border-right: 1px solid #2d3748;
+    }
+    .members h3 { margin-top: 0; color: #7fc3ff; font-size: .95rem; text-transform: uppercase; }
+    .rep { display: flex; gap: 10px; align-items: center; margin: 14px 0; }
+    .avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      background: var(--first-blue); color: white; font-weight: 900; flex: none;
+    }
+    .avatar.red { background: var(--first-red); }
+    .avatar.orange { background: var(--orange); }
+    .rep small { color: #aab4c3; display:block; }
+    .chat {
+      padding: 20px;
+      background: radial-gradient(circle at top right, rgba(0,102,179,.25), transparent 260px), #111827;
+    }
+    .chat-top { display:flex; justify-content:space-between; color:#dbeafe; margin-bottom:16px; font-weight:800; }
+    .message { display: flex; gap: 10px; margin: 14px 0; align-items:flex-start; }
+    .bubble {
+      background: #253044;
+      border-radius: 16px;
+      padding: 11px 14px;
+      max-width: 660px;
+    }
+    .bubble strong { color: white; }
+    .bubble small { color: #aab4c3; margin-left: 6px; }
+    .reacts { margin-top: 7px; color: #e5e7eb; font-size: .9rem; }
+
+    ul.clean { padding-left: 20px; }
+    ul.clean li { margin: 7px 0; }
+    .yes li::marker { color: #0f9f4a; }
+    .no li::marker { color: var(--first-red); }
+
+    details {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+    }
+    details + details { margin-top: 10px; }
+    summary { cursor: pointer; font-weight: 800; color: var(--first-blue); }
+    details p { margin-bottom: 0; }
+
+    footer {
+      background: var(--dark-blue);
+      color: white;
+      text-align: center;
+      padding: 28px 20px;
+    }
+
+    @media (max-width: 850px) {
+      nav { display: none; }
+      .hero-inner { grid-template-columns: 1fr; }
+      .grid.three, .grid.two, .chat-wrap { grid-template-columns: 1fr; }
+      .members { border-right: none; border-bottom: 1px solid #2d3748; }
+      h1 { letter-spacing: -1px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="nav">
+      <div class="brand"><span class="triangle-logo"></span><span>FIRST FTC | Agnesi Hub</span></div>
+      <nav>
+        <a href="#welcome">Welcome</a>
+        <a href="#signup">Sign Up</a>
+        <a href="#join">Join</a>
+        <a href="#community">Community</a>
+        <a href="#guidelines">Guidelines</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="hero" id="welcome">
+    <div class="hero-inner">
+      <div>
+        <h1>Agnesi Hub</h1>
+        <p class="subtitle">Connecting FTC teams across the Agnesi League.</p>
+        <p>Agnesi Hub is a league-wide GroupMe where FTC students, mentors, and coaches can stay informed, connect, and collaborate throughout the season.</p>
+        <div class="button-row">
+          <a class="btn" href="https://forms.gle/nP2B6uHdJQ4TP1ou6" target="_blank">Complete the Form</a>
+          <a class="btn blue" href="#join">Join GroupMe</a>
+        </div>
+      </div>
+      <div class="hero-card">
+        <h2>What is it for?</h2>
+        <ul class="quick-list">
+          <li>Announcements and updates</li>
+          <li>Events and outreach opportunities</li>
+          <li>Scrimmages and collaboration</li>
+          <li>Resources and workshops</li>
+          <li>Celebrating team achievements</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <section id="signup">
+      <h2 class="section-title"><span class="number">1</span> Sign Up</h2>
+      <div class="grid two">
+        <div class="card">
+          <div class="icon">📝</div>
+          <h3>Complete the Registration Form</h3>
+          <p>Before joining, please complete the short form so we know your team name, team number, your name, and whether you are your team representative.</p>
+          <a class="btn blue" href="https://forms.gle/nP2B6uHdJQ4TP1ou6" target="_blank">Open Google Form</a>
+        </div>
+        <div class="card red">
+          <div class="icon">👑</div>
+          <h3>Two Roles</h3>
+          <p><strong>Representatives</strong> can post helpful announcements and information for the league.</p>
+          <p><strong>Members</strong> can read posts, react to messages, participate in polls, and stay informed.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="join">
+      <h2 class="section-title"><span class="number">2</span> Join the GroupMe</h2>
+      <div class="card" style="text-align:center;">
+        <div class="icon">💬</div>
+        <h3>After completing the form, join Agnesi Hub.</h3>
+        <p>Replace this placeholder with your real GroupMe QR code or invite link.</p>
+        <div class="qr-placeholder">QR<br>CODE</div>
+        <a class="btn" href="#">Join GroupMe</a>
+      </div>
+    </section>
+
+    <section id="community">
+      <h2 class="section-title"><span class="number">3</span> What Agnesi Hub Looks Like</h2>
+      <div class="chat-wrap">
+        <div class="members">
+          <h3>Representatives</h3>
+          <div class="rep"><span class="avatar">ED</span><div><strong>Lucy Cramer</strong><small>Evergreen Dynamics #30316</small></div></div>
+          <div class="rep"><span class="avatar red">RR</span><div><strong>David Hummel</strong><small>Richland Robotics #18249</small></div></div>
+          <div class="rep"><span class="avatar orange">HF</span><div><strong>Andre</strong><small>Hanford Falcons #8099</small></div></div>
+          <div class="rep"><span class="avatar">RK</span><div><strong>Preston</strong><small>Run Kano #11990</small></div></div>
+        </div>
+        <div class="chat">
+          <div class="chat-top"><span>Agnesi Hub 🎉</span><span>58 members</span></div>
+          <div class="message"><span class="avatar red">RR</span><div class="bubble"><strong>David Hummel</strong><small>Richland Robotics #18249</small><br>🏆 Congrats to all teams that competed at the preseason scrimmage this weekend. Thanks to everyone who attended!<div class="reacts">👍 18 ❤️ 6</div></div></div>
+          <div class="message"><span class="avatar orange">HF</span><div class="bubble"><strong>Andre</strong><small>Hanford Falcons #8099</small><br>📅 Hanford Falcons will be hosting an FTC CAD workshop on July 19. All Agnesi teams are welcome.<div class="reacts">👍 22</div></div></div>
+          <div class="message"><span class="avatar">RK</span><div class="bubble"><strong>Preston</strong><small>Run Kano #11990</small><br>🤝 Looking for another team interested in a joint outreach event at the Benton Franklin Fair. Reach out if interested.<div class="reacts">👍 15</div></div></div>
+          <div class="message"><span class="avatar">ED</span><div class="bubble"><strong>Lucy Cramer</strong><small>Evergreen Dynamics #30316</small><br>🎓 We just published a beginner Road Runner resource for rookie teams. Happy to share it with anyone who wants it.<div class="reacts">👍 27 ❤️ 11</div></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="guidelines">
+      <h2 class="section-title"><span class="number">4</span> Guidelines & Roles</h2>
+      <div class="grid three">
+        <div class="card">
+          <h3>Members</h3>
+          <p>Members can:</p>
+          <ul class="clean yes">
+            <li>Read announcements and updates</li>
+            <li>React to messages</li>
+            <li>Participate in polls</li>
+            <li>Stay informed about league activities</li>
+          </ul>
+          <p>Members cannot:</p>
+          <ul class="clean no">
+            <li>Create posts in the main group</li>
+            <li>Spam reactions or messages</li>
+            <li>Share inappropriate content</li>
+          </ul>
+        </div>
+        <div class="card red">
+          <h3>Representatives</h3>
+          <p>Representatives can post:</p>
+          <ul class="clean yes">
+            <li>Team announcements</li>
+            <li>Outreach opportunities</li>
+            <li>Scrimmages and events</li>
+            <li>Resources and workshops</li>
+            <li>Team accomplishments</li>
+          </ul>
+          <p>Representatives should:</p>
+          <ul class="clean yes">
+            <li>Verify information before posting</li>
+            <li>Keep messages clear and concise</li>
+            <li>Represent their team respectfully</li>
+          </ul>
+        </div>
+        <div class="card orange">
+          <h3>Community Values</h3>
+          <ul class="clean">
+            <li>Gracious Professionalism</li>
+            <li>Collaboration</li>
+            <li>Learning</li>
+            <li>Innovation</li>
+            <li>Friendly Competition</li>
+          </ul>
+          <p><strong>Goal:</strong> Keep Agnesi Hub useful, positive, and welcoming for every team.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq">
+      <h2 class="section-title"><span class="number">5</span> Commonly Asked Questions</h2>
+      <details open>
+        <summary>Who can join Agnesi Hub?</summary>
+        <p>Students, mentors, and coaches from Agnesi League FTC teams may join.</p>
+      </details>
+      <details>
+        <summary>Why can't members post messages?</summary>
+        <p>To keep the feed organized, focused, and useful for everyone. Members can still react, participate in polls, and stay informed.</p>
+      </details>
+      <details>
+        <summary>How many representatives can each team have?</summary>
+        <p>Each team should have one active representative at a time.</p>
+      </details>
+      <details>
+        <summary>Can our team change representatives?</summary>
+        <p>Yes. Teams can update their representative if needed.</p>
+      </details>
+      <details>
+        <summary>What should representatives post?</summary>
+        <p>Representatives should post information that benefits the Agnesi League community, such as events, outreach, workshops, resources, scrimmages, and team celebrations.</p>
+      </details>
+      <details>
+        <summary>Can coaches and mentors join?</summary>
+        <p>Yes. Students, coaches, and mentors are all welcome.</p>
+      </details>
+    </section>
+  </main>
+
+  <footer>
+    <strong>Agnesi Hub</strong><br />
+    Building a stronger FTC community across the Agnesi League.
+  </footer>
+</body>
+</html>
