@@ -1,0 +1,44 @@
+{
+  "team": {
+    "name": "Evergreen Dynamics",
+    "number": 30316,
+    "season": "2026-2027",
+    "game": "BIOBUZZ"
+  },
+  "competitions": [
+    {
+      "id": "league-meet-1",
+      "name": "League Meet 1",
+      "date": "2026-10-31",
+      "status": "scheduled"
+    },
+    {
+      "id": "league-meet-2",
+      "name": "League Meet 2",
+      "date": "2026-11-21",
+      "status": "scheduled"
+    },
+    {
+      "id": "interleagues",
+      "name": "Interleagues",
+      "date": null,
+      "status": "tbd"
+    },
+    {
+      "id": "semifinals",
+      "name": "Semifinals",
+      "date": null,
+      "status": "tbd"
+    },
+    {
+      "id": "wa-state-championship",
+      "name": "WA State Championship",
+      "date": null,
+      "status": "tbd"
+    }
+  ],
+  "practice": {
+    "practiceCount": 12,
+    "totalHours": 36
+  }
+}
