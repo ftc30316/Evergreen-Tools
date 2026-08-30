@@ -9,30 +9,35 @@
     {
       "id": "league-meet-1",
       "name": "League Meet 1",
+      "shortName": "League 1",
       "date": "2026-10-31",
       "status": "scheduled"
     },
     {
       "id": "league-meet-2",
       "name": "League Meet 2",
+      "shortName": "League 2",
       "date": "2026-11-21",
       "status": "scheduled"
     },
     {
       "id": "interleagues",
       "name": "Interleagues",
+      "shortName": "Interleagues",
       "date": null,
       "status": "tbd"
     },
     {
       "id": "semifinals",
       "name": "Semifinals",
+      "shortName": "Semifinals",
       "date": null,
       "status": "tbd"
     },
     {
       "id": "wa-state-championship",
       "name": "WA State Championship",
+      "shortName": "WA State",
       "date": null,
       "status": "tbd"
     }
@@ -40,5 +45,11 @@
   "practice": {
     "practiceCount": 12,
     "totalHours": 36
+  },
+  "impact": {
+    "peopleReached": 0,
+    "outreachEvents": 0,
+    "teamsMentored": 0,
+    "stemConnections": 0
   }
 }
