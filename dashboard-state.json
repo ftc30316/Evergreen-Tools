@@ -6,50 +6,50 @@
     "game": "BIOBUZZ"
   },
   "competitions": [
-    {
-      "id": "league-meet-1",
-      "name": "League Meet 1",
-      "shortName": "League 1",
-      "date": "2026-10-31",
-      "status": "scheduled"
-    },
-    {
-      "id": "league-meet-2",
-      "name": "League Meet 2",
-      "shortName": "League 2",
-      "date": "2026-11-21",
-      "status": "scheduled"
-    },
-    {
-      "id": "interleagues",
-      "name": "Interleagues",
-      "shortName": "Interleagues",
-      "date": null,
-      "status": "tbd"
-    },
-    {
-      "id": "semifinals",
-      "name": "Semifinals",
-      "shortName": "Semifinals",
-      "date": null,
-      "status": "tbd"
-    },
-    {
-      "id": "wa-state-championship",
-      "name": "WA State Championship",
-      "shortName": "WA State",
-      "date": null,
-      "status": "tbd"
-    }
+    {"id":"league-meet-1","name":"League Meet 1","shortName":"League 1","date":"2026-10-31","status":"scheduled"},
+    {"id":"league-meet-2","name":"League Meet 2","shortName":"League 2","date":"2026-11-21","status":"scheduled"},
+    {"id":"interleagues","name":"Interleagues","shortName":"Interleagues","date":null,"status":"tbd"},
+    {"id":"semifinals","name":"Semifinals","shortName":"Semifinals","date":null,"status":"tbd"},
+    {"id":"wa-state-championship","name":"WA State Championship","shortName":"WA State","date":null,"status":"tbd"}
   ],
-  "practice": {
-    "practiceCount": 12,
-    "totalHours": 36
+  "practice": {"practiceCount":12,"totalHours":36},
+  "connect": {
+    "stemConnections": 0,
+    "stemEngagements": 0,
+    "skillGoals": 0,
+    "skillGoalsAchieved": 0
   },
-  "impact": {
-    "peopleReached": 362,
-    "outreachEvents": 2,
-    "teamsMentored": 3,
-    "stemConnections": 0
+  "reach": {
+    "peopleReached": 0,
+    "outreachEvents": 0,
+    "firstRecruits": 4,
+    "teamsSupported": 0
+  },
+  "sustain": {
+    "financials": {
+      "sponsorCount": 0,
+      "sponsorFunds": 0,
+      "fundraiserCount": 0,
+      "fundraisingRevenue": 0,
+      "fundsRaised": 0,
+      "fundsSpent": 0
+    },
+    "subteams": [
+      {"name":"Strategy","lead":"","students":[],"mentors":[]},
+      {"name":"Design","lead":"","students":[],"mentors":["Noah"]},
+      {"name":"Build","lead":"","students":[],"mentors":["Doug"]},
+      {"name":"Code","lead":"","students":[],"mentors":["Eric"]},
+      {"name":"Outreach","lead":"","students":[],"mentors":["Carolyn","Rajiv"]},
+      {"name":"Drive","lead":"","students":[],"mentors":[]}
+    ],
+    "rookieDevelopment": {
+      "pairings": [
+        {"rookie":"Easton","veteran":"Lucy"},
+        {"rookie":"Leo","veteran":"Adi"},
+        {"rookie":"Isaac","veteran":"Sam"},
+        {"rookie":"Krithi","veteran":"Bianca"}
+      ]
+    },
+    "risks": []
   }
 }
