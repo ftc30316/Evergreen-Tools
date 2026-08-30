@@ -20,33 +20,33 @@
     "skillGoalsAchieved": 0
   },
   "reach": {
-    "peopleReached": 0,
-    "outreachEvents": 0,
-    "firstRecruits": 4,
-    "teamsSupported": 0
+    "peopleReached": 362,
+    "outreachEvents": 2,
+    "firstRecruits": 10,
+    "teamsSupported": 3
   },
   "sustain": {
     "financials": {
-      "sponsorCount": 0,
-      "sponsorFunds": 0,
-      "fundraiserCount": 0,
+      "sponsorCount": 5,
+      "sponsorFunds": 5096.94,
+      "fundraiserCount": 2,
       "fundraisingRevenue": 0,
-      "fundsRaised": 0,
-      "fundsSpent": 0
+      "fundsRaised": 7963.82,
+      "fundsSpent": 5725.83
     },
     "subteams": [
-      {"name":"Strategy","lead":"","students":[],"mentors":[]},
-      {"name":"Design","lead":"","students":[],"mentors":["Noah"]},
-      {"name":"Build","lead":"","students":[],"mentors":["Doug"]},
-      {"name":"Code","lead":"","students":[],"mentors":["Eric"]},
-      {"name":"Outreach","lead":"","students":[],"mentors":["Carolyn","Rajiv"]},
-      {"name":"Drive","lead":"","students":[],"mentors":[]}
+      {"name":"Strategy","lead":"Aadhya","students":["Sami", "Adi"],"mentors":["Rajiv"]},
+      {"name":"Design","lead":"Lucy","students":["Easton"],"mentors":["Noah"]},
+      {"name":"Build","lead":"Sam","students":["Isaac", "Lucy", "Easton"],"mentors":["Doug"]},
+      {"name":"Code","lead":"Adi","students":["Bianca", "Leo", "Krithi"],"mentors":["Eric"]},
+      {"name":"Outreach","lead":"Sami","students":["Aadhya", "Adi"],"mentors":["Carolyn"]},
+      {"name":"Drive","lead":"Sami","students":["Isaac", "Sam"],"mentors":["Nick"]}
     ],
     "rookieDevelopment": {
       "pairings": [
         {"rookie":"Easton","veteran":"Lucy"},
         {"rookie":"Leo","veteran":"Adi"},
-        {"rookie":"Isaac","veteran":"Sam"},
+        {"rookie":"Isaac","veteran":"Lucy"},
         {"rookie":"Krithi","veteran":"Bianca"}
       ]
     },
