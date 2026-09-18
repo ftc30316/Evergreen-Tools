@@ -1,5 +1,6 @@
 # Coaches Connect — Full Presentation Script
 
+**Slides:** [Open the Canva presentation](https://canva.link/y4t2tod9qrn13mm)
 **Format:** ~35 minutes of presentation + ~25 minutes of Q&A  
 **Primary speaker:** Host Coach  
 **Supporting speakers:** 2–3 former Intelligent Mavericks students
