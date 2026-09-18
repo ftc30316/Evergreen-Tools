@@ -2,6 +2,24 @@
 
 **Slides:** [Open the Canva presentation](https://canva.link/y4t2tod9qrn13mm)
 
+## Zoom Information
+
+### Friday, Sept. 18 — 3:30–4:30 PM Pacific
+**Zoom Link:**  
+https://us06web.zoom.us/j/82812042383?pwd=fqVbeeo5iWXPG8CUknDETam66px8LW.1
+
+**Meeting ID:** 828 1204 2383
+
+---
+
+### Saturday, Sept. 19 — 11:30 AM–12:30 PM Pacific
+**Zoom Link:**  
+https://us06web.zoom.us/j/81652799837?pwd=iDeMI8r6XRJ8OOifPm1OqgvmBDGciR.1
+
+**Meeting ID:** 816 5279 9837
+
+---
+
 **Format:** ~35 minutes of presentation + ~25 minutes of Q&A  
 **Primary speaker:** Host Coach  
 **Supporting speakers:** 2–3 former Intelligent Mavericks students
