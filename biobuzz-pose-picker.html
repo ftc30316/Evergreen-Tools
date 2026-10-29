@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>BIOBUZZ | FTC Field Pose Picker</title>
+<style>
+  :root { font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color-scheme: dark; --bg:#0b1120; --card:#111c2f; --card2:#18253a; --border:#2a3b53; --text:#edf3fb; --muted:#9bacbf; --brand:#70e5bd; --brandDark:#123d38; --gold:#ffcf77; --input:#0d1728; --danger:#f2a3a7; }
+  * { box-sizing: border-box; }
+  body { margin: 0; color:var(--text); background:radial-gradient(ellipse 1100px 620px at 8% -20%, #183650 0%, transparent 65%), var(--bg); min-height:100vh; }
+  .app { max-width:1440px; margin:0 auto; padding:22px clamp(12px,2.6vw,32px) 36px; }
+  .top { display:flex; flex-wrap:wrap; gap:12px; justify-content:space-between; align-items:center; margin-bottom:22px; }
+  .brand { display:flex; align-items:center; gap:13px; }
+  .logo { border:1px solid #346965; background:linear-gradient(145deg,#1d5e5c,#153344); color:#ccffee; width:46px; height:46px; display:grid; place-items:center; border-radius:14px; font-size:24px; font-weight:800; }
+  h1 { font-size:clamp(20px,2.6vw,29px); line-height:1.12; letter-spacing:-.055em; margin:0 0 4px; }
+  .subtitle { font-size:13px; color:var(--muted); margin:0; }
+  .top-controls { display:flex; align-items:center; flex-wrap:wrap; gap:9px; }
+  select, input, button { font:inherit; }
+  button, select { border:1px solid var(--border); background:var(--card2); color:var(--text); border-radius:10px; padding:10px 12px; font-size:13px; }
+  button { cursor:pointer; transition:background .15s,border-color .15s,transform .15s; font-weight:600; }
+  button:hover:not(:disabled) { background:#24364e; border-color:#64809a; }
+  button:active:not(:disabled) { transform:translateY(1px); }
+  button:disabled { opacity:.43; cursor:not-allowed; }
+  button:focus-visible, input:focus-visible, select:focus-visible { outline:2px solid var(--brand); outline-offset:2px; }
+  button.primary { background:var(--brand); color:#09241f; border-color:var(--brand); }
+  button.primary:hover:not(:disabled) { background:#a5f9db; border-color:#a5f9db; }
+  button.subtle { background:transparent; }
+  button.danger { color:var(--danger); }
+  button.small { padding:7px 10px; font-size:12px; }
+  .layout { display:grid; grid-template-columns:minmax(0,1fr) 340px; align-items:start; gap:20px; }
+  .panel { background:var(--card); border:1px solid var(--border); box-shadow:0 8px 26px #0002; border-radius:16px; }
+  .field-panel { padding:14px; min-width:0; }
+  .field-head { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px; padding:2px 2px 12px; }
+  .field-head-left { display:flex; align-items:center; gap:9px; }
+  .dot { width:8px; height:8px; background:var(--brand); border-radius:50%; box-shadow:0 0 0 4px #70e5bd18; }
+  .phase { font-size:13px; font-weight:750; }
+  .helper { font-size:12px; color:var(--muted); }
+  .field-wrap { width:100%; max-width:840px; margin:0 auto; aspect-ratio:1; position:relative; overflow:hidden; background:#172739; border:1px solid #52667b; border-radius:7px; touch-action:none; user-select:none; -webkit-user-select:none; cursor:crosshair; }
+  .field-wrap img, .field-wrap canvas { display:block; width:100%; height:100%; position:absolute; inset:0; }
+  .field-wrap img { object-fit:fill; pointer-events:none; }
+  .field-wrap canvas { touch-action:none; }
+  .field-wrap.dragging { cursor:grabbing; }
+  .field-wrap.can-drag { cursor:grab; }
+  .field-bottom { display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin:12px 1px 1px; }
+  .check { display:inline-flex; align-items:center; gap:7px; font-size:12px; color:var(--muted); cursor:pointer; }
+  .check input { accent-color:#60d7b0; cursor:pointer; }
+  .image-state { color:var(--muted); font-size:12px; }
+  .image-state.warning { color:var(--gold); }
+  .controls { display:flex; flex-direction:column; gap:14px; }
+  .block { padding:17px; }
+  .heading-row { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:14px; }
+  h2 { font-size:15px; letter-spacing:-.018em; margin:0; }
+  .tag { color:var(--brand); background:#70e5bd18; border:1px solid #70e5bd3c; border-radius:7px; font-size:11px; font-weight:700; padding:4px 7px; }
+  .readout { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+  .value-card { padding:12px 8px; border-radius:10px; background:var(--card2); border:1px solid var(--border); min-width:0; }
+  .label { font-size:11px; color:var(--muted); margin-bottom:5px; }
+  .big { font-size:clamp(17px,2vw,23px); letter-spacing:-.04em; font-weight:760; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .big .unit { font-size:11px; color:var(--muted); font-weight:500; letter-spacing:0; }
+  .instruction { min-height:38px; margin:13px 0 0; color:var(--muted); font-size:12px; line-height:1.55; }
+  .guide { display:flex; align-items:center; gap:7px; margin:12px 0 0; flex-wrap:wrap; font-size:11px; }
+  .step { background:var(--card2); border:1px solid var(--border); border-radius:50px; padding:4px 7px; color:var(--muted); }
+  .step.active { color:var(--brand); border-color:#4b9b83; }
+  .sep { color:#526179; }
+  .edit-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:9px; }
+  .edit-grid label { display:flex; flex-direction:column; gap:6px; color:var(--muted); font-size:11px; font-weight:600; }
+  input[type=number], input[type=text] { min-width:0; width:100%; border:1px solid var(--border); border-radius:9px; background:var(--input); color:var(--text); font-size:14px; padding:10px; outline:none; }
+  input[type=number]:focus, input[type=text]:focus { border-color:var(--brand); }
+  input:disabled { opacity:.45; }
+  .button-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-top:12px; }
+  .full { width:100%; }
+  .field-note { font-size:11px; color:var(--muted); line-height:1.5; margin:10px 0 0; }
+  .save-line { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; margin-top:11px; }
+  .saved { list-style:none; padding:0; margin:10px 0 0; max-height:230px; overflow-y:auto; }
+  .saved li { display:flex; align-items:center; gap:6px; border-top:1px solid var(--border); padding:7px 0; }
+  .saved li:first-child { border-top:0; }
+  .saved .item { flex:1; background:transparent; padding:7px 3px; border:0; text-align:left; min-width:0; display:flex; align-items:center; gap:9px; }
+  .saved .item:hover { background:var(--card2); }
+  .index { width:24px; height:24px; background:#34515d; color:#b5e3e0; border-radius:8px; display:grid; place-items:center; font-size:11px; flex:0 0 24px; }
+  .saved .item.active .index { background:var(--brand); color:#0b2a25; }
+  .saved strong { display:block; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:185px; }
+  .saved small { display:block; font-size:11px; color:var(--muted); margin-top:2px; font-weight:400; font-variant-numeric:tabular-nums; }
+  .empty { color:var(--muted); font-size:12px; margin:12px 0; }
+  .footer { margin-top:20px; color:var(--muted); font-size:12px; line-height:1.7; text-align:center; }
+  .alert { color:var(--gold); font-size:12px; margin:10px 0 0; line-height:1.5; }
+  .toast { position:fixed; bottom:23px; left:50%; transform:translateX(-50%) translateY(15px); opacity:0; pointer-events:none; transition:opacity .2s,transform .2s; background:#d6fcec; color:#06352a; font-weight:700; font-size:13px; border-radius:10px; padding:11px 18px; z-index:20; box-shadow:0 15px 45px #0006; }
+  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+  .mini-code { margin:10px 0 0; background:var(--input); border:1px solid var(--border); border-radius:9px; padding:11px; color:#b8e9d2; font:12px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace; white-space:pre-wrap; overflow-wrap:anywhere; }
+  .subline { margin:0; font-size:12px; color:var(--muted); }
+  .upload { display:none; }
+  @media (max-width:1000px) { .layout { grid-template-columns:minmax(0,1fr) 310px; gap:12px; } .block { padding:14px; } .app { padding-top:14px; } }
+  @media (max-width:750px) { .layout { grid-template-columns:1fr; } .controls { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); align-items:start; } .controls .wide { grid-column:span 2; } .top { margin-bottom:13px; } }
+  @media (max-width:540px) { .controls { display:flex; } .field-panel { padding:8px; } .field-head { padding:5px 5px 10px; } .logo { width:40px; height:40px; } .top-controls { width:100%; } .top-controls select { flex:1; } .field-bottom { padding:0 6px; } .app { padding-inline:9px; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand"><div class="logo" aria-hidden="true">⌖</div><div><h1>BIOBUZZ Pose Picker</h1><p class="subtitle">FTC • 144 × 144 in field • 18 × 18 in robot</p></div></div>
+    <div class="top-controls">
+      <label class="helper" for="theme">Field image</label>
+      <select id="theme" aria-label="Field image theme"><option value="dark">Dark field</option><option value="light">Light field</option></select>
+      <button id="loadImage" type="button" title="Select a field image directly from your device">Load field PNG…</button>
+      <input class="upload" id="fileUpload" type="file" accept="image/png,image/jpeg,image/webp,image/*">
+    </div>
+  </header>
+  <main class="layout">
+    <section class="panel field-panel" aria-label="Interactive FTC field">
+      <div class="field-head">
+        <div class="field-head-left"><span class="dot"></span><span class="phase" id="phase">Position preview</span></div>
+        <span class="helper" id="pointerInfo">Move over field to preview</span>
+      </div>
+      <div class="field-wrap" id="fieldWrap">
+        <img id="fieldImage" alt="BIOBUZZ field" draggable="false">
+        <canvas id="overlay" aria-label="Interactive 144 inch by 144 inch field. Click to position robot; move to aim; click again to lock heading."></canvas>
+      </div>
+      <div class="field-bottom">
+        <label class="check"><input type="checkbox" id="gridToggle"> Show 12-inch grid</label>
+        <span class="image-state" id="imageState" role="status"></span>
+      </div>
+    </section>
+    <aside class="controls">
+      <section class="panel block">
+        <div class="heading-row"><h2>Current robot pose</h2><span class="tag" id="poseStatus">PREVIEW</span></div>
+        <div class="readout" aria-live="off">
+          <div class="value-card"><div class="label">X</div><div class="big"><span id="posX">—</span><span class="unit"> in</span></div></div>
+          <div class="value-card"><div class="label">Y</div><div class="big"><span id="posY">—</span><span class="unit"> in</span></div></div>
+          <div class="value-card"><div class="label">Heading</div><div class="big"><span id="posH">—</span><span class="unit"> °</span></div></div>
+        </div>
+        <p class="instruction" id="instruction">Move your mouse over the field. An actual-size robot footprint follows your cursor.</p>
+        <div class="guide" aria-label="Two click placement workflow"><span class="step active" id="step1">1 · Position</span><span class="sep">→</span><span class="step" id="step2">2 · Aim</span><span class="sep">→</span><span class="step" id="step3">3 · Locked</span></div>
+        <p class="alert" id="outsideAlert" hidden>⚠ Part of the rotated robot footprint extends outside the field.</p>
+      </section>
+      <section class="panel block">
+        <div class="heading-row"><h2>Fine-tune coordinates</h2><span class="helper">0.1 precision</span></div>
+        <div class="edit-grid">
+          <label>X (in)<input type="number" id="editX" min="9" max="135" step="0.1" inputmode="decimal" disabled></label>
+          <label>Y (in)<input type="number" id="editY" min="9" max="135" step="0.1" inputmode="decimal" disabled></label>
+          <label>Heading (°)<input type="number" id="editH" min="0" max="359.9" step="0.1" inputmode="decimal" disabled></label>
+        </div>
+        <div class="button-grid">
+          <button id="newPose" class="primary" type="button">+ New pose</button>
+          <button id="reaim" type="button" disabled>Re-aim heading</button>
+          <button id="copyCoords" type="button" disabled>Copy X, Y, H</button>
+          <button id="copyJava" type="button" disabled>Copy Pedro Java</button>
+        </div>
+        <div class="mini-code" id="javaPreview">new Pose(—, —, Math.toRadians(—))</div>
+        <p class="field-note">Field origin: bottom-left (X → right, Y ↑ up). Heading matches your image: 0° down, 90° left, 180° up, 270° right. No heading conversion is applied to Java output.</p>
+      </section>
+      <section class="panel block wide">
+        <div class="heading-row"><h2>Saved poses</h2><span class="helper" id="savedCount">0 poses</span></div>
+        <div class="save-line"><input id="poseName" type="text" maxlength="64" placeholder="Pose name (e.g. Launch 1)" aria-label="Pose name"><button class="primary" id="savePose" disabled>Save pose</button></div>
+        <ul id="savedList" class="saved"></ul>
+        <div class="button-grid"><button id="exportCSV" disabled>Export CSV</button><button id="exportJSON" disabled>Export JSON</button></div>
+        <button id="clearAll" class="subtle danger full" style="margin-top:9px" disabled>Clear saved poses</button>
+        <p class="field-note">Saved poses are drawn on the field. Choose one to edit it; save again to update. Your browser stores them locally when supported.</p>
+      </section>
+    </aside>
+  </main>
+  <footer class="footer">Place this HTML next to <strong>biobuzz-field-dark.png</strong> and <strong>biobuzz-field-light.png</strong>, or use “Load field PNG…” for your own images.<br>Works offline. All geometry is in inches; field art is assumed to cover the entire 144 × 144 in square.</footer>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<script>
+(() => {
+  'use strict';
+  const FIELD=144, ROBOT=18, HALF=ROBOT/2;
+  const FILENAME={dark:'biobuzz-field-dark.png', light:'biobuzz-field-light.png'};
+  const $=id=>document.getElementById(id);
+  const wrap=$('fieldWrap'), canvas=$('overlay'), ctx=canvas.getContext('2d');
+  const elements={ phase:$('phase'), pointer:$('pointerInfo'), poseStatus:$('poseStatus'),
+    posX:$('posX'),posY:$('posY'),posH:$('posH'),instruction:$('instruction'),
+    editX:$('editX'),editY:$('editY'),editH:$('editH'),out:$('outsideAlert'),
+    reaim:$('reaim'),copyCoords:$('copyCoords'),copyJava:$('copyJava'),
+    javaPreview:$('javaPreview'),poseName:$('poseName'),save:$('savePose'),
+    savedCount:$('savedCount'),list:$('savedList'),exportCSV:$('exportCSV'),
+    exportJSON:$('exportJSON'),clear:$('clearAll'),theme:$('theme'),
+    grid:$('gridToggle'),image:$('fieldImage'),imageState:$('imageState')};
+  let mode='placing'; // placing -> aiming -> locked
+  let current=null, hovered=null, selected=-1, saved=[];
+  let dragging=null, activePointer=null;
+  let canvasSide=1, toastTimeout=null;
+  let imageReady=false;
+  const imageOverrides={dark:null,light:null};
+  const round1=v=>Math.round((v+Number.EPSILON)*10)/10;
+  const normalizeHeading=v=>round1(((v%360)+360)%360)%360;
+  const clamp=(v,min,max)=>Math.min(max,Math.max(min,v));
+  const validNum=v=>typeof v==='number'&&Number.isFinite(v);
+  const serializePose=p=>({x:round1(p.x),y:round1(p.y),heading:normalizeHeading(p.heading)});
+  const display=v=>validNum(v)?v.toFixed(1):'—';
+  const formatJava=p=>`new Pose(${display(p.x)}, ${display(p.y)}, Math.toRadians(${display(p.heading)}))`;
+  const within=(p)=>p&&validNum(p.x)&&validNum(p.y)&&p.x>=HALF&&p.x<=FIELD-HALF&&p.y>=HALF&&p.y<=FIELD-HALF;
+  const safeGet=(key)=>{try{return localStorage.getItem(key)}catch{return null}};
+  const safeSet=(key,val)=>{try{localStorage.setItem(key,val)}catch{/* File URL storage may be restricted */}};
+  function restore(){
+    try {
+      const obj=JSON.parse(safeGet('biobuzz_pose_picker_v1')||'{}');
+      if(Array.isArray(obj.saved)) saved=obj.saved.filter(s=>within(s)&&validNum(s.heading))
+        .slice(0,150).map((s,i)=>({...serializePose(s),name:String(s.name||`Pose ${i+1}`).slice(0,64)}));
+      if(['dark','light'].includes(obj.theme)) elements.theme.value=obj.theme;
+      elements.grid.checked=!!obj.grid;
+    } catch {saved=[];}
+  }
+  function persist(){safeSet('biobuzz_pose_picker_v1',JSON.stringify({saved,theme:elements.theme.value,grid:elements.grid.checked}));}
+  function toast(msg){const el=$('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>el.classList.remove('show'),2200);}
+  function loadImage(){
+    const theme=elements.theme.value;
+    const target=imageOverrides[theme]||FILENAME[theme];
+    imageReady=false;
+    elements.image.style.visibility='hidden';
+    elements.image.onload=()=>{imageReady=true;elements.image.style.visibility='visible';elements.imageState.textContent='Field art loaded';elements.imageState.classList.remove('warning');draw();};
+    elements.image.onerror=()=>{imageReady=false;elements.image.style.visibility='hidden';elements.imageState.textContent=`Missing ${FILENAME[theme]} — showing fallback`;elements.imageState.classList.add('warning');draw();};
+    elements.image.src=target;
+    draw();
+  }
+  function resize(){
+    const r=wrap.getBoundingClientRect(), dpr=window.devicePixelRatio||1;
+    canvasSide=r.width;
+    canvas.width=Math.max(1,Math.round(r.width*dpr));
+    canvas.height=Math.max(1,Math.round(r.height*dpr));
+    draw();
+  }
+  function fromPointer(e){
+    const r=canvas.getBoundingClientRect();
+    const xx=(e.clientX-r.left)/r.width*FIELD, yy=(e.clientY-r.top)/r.height*FIELD;
+    return {x:round1(clamp(xx,0,FIELD)),y:round1(FIELD-clamp(yy,0,FIELD))};
+  }
+  function positionForPointer(p){return {x:round1(clamp(p.x,HALF,FIELD-HALF)),y:round1(clamp(p.y,HALF,FIELD-HALF))};}
+  function headingToPointer(center,p){
+    const dx=p.x-center.x, dy=p.y-center.y; // Field Y increases upward.
+    if(Math.hypot(dx,dy)<0.15) return center.heading;
+    // 0 down / 90 left / 180 up / 270 right: no Pedro heading conversion.
+    return normalizeHeading(Math.atan2(-dx,-dy)*180/Math.PI);
+  }
+  function footprintOutside(p){
+    if(!p) return false;
+    const t=p.heading*Math.PI/180;
+    const ext=HALF*(Math.abs(Math.cos(t))+Math.abs(Math.sin(t)));
+    return p.x<ext-0.00001||p.x>FIELD-ext+0.00001||p.y<ext-0.00001||p.y>FIELD-ext+0.00001;
+  }
+  function pointInRobot(pt,p){
+    if(!p) return false;
+    const t=p.heading*Math.PI/180, dx=pt.x-p.x, dy=-(pt.y-p.y);
+    const lx=dx*Math.cos(t)+dy*Math.sin(t), ly=-dx*Math.sin(t)+dy*Math.cos(t);
+    return Math.abs(lx)<=HALF&&Math.abs(ly)<=HALF;
+  }
+  function fieldCoords(p){return [p.x,FIELD-p.y];}
+  function drawFallback(){
+    ctx.fillStyle='#18283a';ctx.fillRect(0,0,FIELD,FIELD);
+    ctx.fillStyle='#19364c';ctx.fillRect(0,0,FIELD/2,FIELD/2);
+    ctx.fillStyle='#352b44';ctx.fillRect(FIELD/2,FIELD/2,FIELD/2,FIELD/2);
+    ctx.save();ctx.strokeStyle='#ffffff12';ctx.lineWidth=.35;
+    for(let v=12;v<FIELD;v+=12){ctx.beginPath();ctx.moveTo(v,0);ctx.lineTo(v,FIELD);ctx.moveTo(0,v);ctx.lineTo(FIELD,v);ctx.stroke();}
+    ctx.strokeStyle='#a4b8c6aa';ctx.lineWidth=.65;ctx.strokeRect(.4,.4,FIELD-.8,FIELD-.8);
+    ctx.fillStyle='#c7d5e1ad';ctx.font='4px system-ui,sans-serif';ctx.textAlign='center';
+    ctx.fillText('ADD YOUR BIOBUZZ FIELD PNG',FIELD/2,FIELD/2-11);
+    ctx.font='2.7px system-ui,sans-serif';ctx.fillText('Image must cover the entire 144 × 144 inch square',FIELD/2,FIELD/2-5);
+    ctx.restore();
+  }
+  function drawGrid(){
+    ctx.save();ctx.lineWidth=.2;ctx.strokeStyle='#d9edf968';
+    for(let k=12;k<FIELD;k+=12){ctx.beginPath();ctx.moveTo(k,0);ctx.lineTo(k,FIELD);ctx.moveTo(0,k);ctx.lineTo(FIELD,k);ctx.stroke();}
+    ctx.lineWidth=.4;ctx.strokeStyle='#fff9';ctx.beginPath();ctx.moveTo(72,0);ctx.lineTo(72,144);ctx.moveTo(0,72);ctx.lineTo(144,72);ctx.stroke();
+    ctx.restore();
+  }
+  function drawRobot(p,opts={}){
+    const [cx,cy]=fieldCoords(p), t=p.heading*Math.PI/180;
+    const ghost=!!opts.ghost, savedRobot=!!opts.saved, warning=footprintOutside(p);
+    ctx.save();ctx.translate(cx,cy);ctx.rotate(t);
+    ctx.lineWidth=ghost?.62:.72;
+    ctx.strokeStyle=warning?'#ff888c':ghost?'#d9f7ff':savedRobot?'#8bade0':'#8cffe0';
+    ctx.fillStyle=ghost?'#a0e4fa23':savedRobot?'#699acc30':'#57e1bb47';
+    if(ghost)ctx.setLineDash([2,1.4]);
+    ctx.fillRect(-HALF,-HALF,ROBOT,ROBOT);ctx.strokeRect(-HALF,-HALF,ROBOT,ROBOT);
+    ctx.setLineDash([]);
+    ctx.fillStyle=warning?'#ff9898':ghost?'#ccf5ff':savedRobot?'#b4d3ff':'#afffe6';
+    ctx.fillRect(-HALF,HALF-1.6,ROBOT,1.6); // front bumper faces down at 0 deg
+    ctx.beginPath();ctx.moveTo(0,6);ctx.lineTo(-3,0);ctx.lineTo(-1.3,0);ctx.lineTo(-1.3,-5.6);ctx.lineTo(1.3,-5.6);ctx.lineTo(1.3,0);ctx.lineTo(3,0);ctx.closePath();ctx.fill();
+    ctx.beginPath();ctx.arc(0,0,.9,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();
+    ctx.restore();
+    if(opts.label){
+      ctx.save();ctx.font='bold 2.8px system-ui,sans-serif';
+      const label=opts.label.slice(0,20), w=Math.min(ctx.measureText(label).width+3,49);
+      let lx=clamp(cx-w/2,1,FIELD-w-1), ly=cy-14;
+      if(ly<1) ly=cy+12;
+      ctx.fillStyle=opts.active?'#10654d':'#203c5ccc';ctx.fillRect(lx,ly,w,5);
+      ctx.fillStyle='#fff';ctx.textAlign='center';ctx.fillText(label,lx+w/2,ly+3.4);ctx.restore();
+    }
+  }
+  function drawAim(p){
+    if(!hovered) return;
+    const [cx,cy]=fieldCoords(p),[hx,hy]=fieldCoords(hovered);
+    ctx.save();ctx.strokeStyle='#ffdc90';ctx.lineWidth=.52;ctx.setLineDash([2.2,1.4]);
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(hx,hy);ctx.stroke();ctx.setLineDash([]);
+    ctx.beginPath();ctx.arc(hx,hy,1.6,0,Math.PI*2);ctx.fillStyle='#ffe0a7';ctx.fill();
+    ctx.beginPath();ctx.arc(cx,cy,2.1,0,Math.PI*2);ctx.stroke();ctx.restore();
+  }
+  function drawCursor(p){
+    if(!p) return;
+    const [cx,cy]=fieldCoords(p);
+    ctx.save();ctx.strokeStyle='#fff9';ctx.lineWidth=.3;
+    ctx.beginPath();ctx.moveTo(cx-4,cy);ctx.lineTo(cx+4,cy);ctx.moveTo(cx,cy-4);ctx.lineTo(cx,cy+4);ctx.stroke();ctx.restore();
+  }
+  function draw(){
+    if(!canvas.width||!canvasSide) return;
+    const s=canvas.width/FIELD;
+    ctx.setTransform(s,0,0,s,0,0);ctx.clearRect(0,0,FIELD,FIELD);
+    if(!imageReady)drawFallback();
+    if(elements.grid.checked)drawGrid();
+    saved.forEach((p,i)=>{if(i!==selected)drawRobot(p,{saved:true,label:String(i+1)});});
+    if(mode==='placing'&&hovered){
+      const p=positionForPointer(hovered);
+      drawRobot({...p,heading:0},{ghost:true});drawCursor(hovered);
+    }
+    if(current){
+      if(mode==='aiming')drawAim(current);
+      drawRobot(current,{label:selected>=0?String(selected+1):'' ,active:true});
+      if(mode==='aiming'&&hovered)drawCursor(hovered);
+    }
+  }
+  function phaseUpdate(){
+    const messages={
+      placing:['Position preview','PREVIEW','Move your mouse (or touch) over the field to preview the 18 × 18 inch robot. Click or tap once to place its center.'],
+      aiming:['Choose heading','AIMING','Move the pointer around the fixed robot center to set its heading. Click or tap a second time to lock.'],
+      locked:['Pose ready','LOCKED','Position and heading are set. Drag the robot to reposition, re-aim its heading, save it, or click empty field to start a new pose.']
+    };
+    const [phase,badge,instruction]=messages[mode];
+    elements.phase.textContent=phase;elements.poseStatus.textContent=badge;elements.instruction.textContent=instruction;
+    ['step1','step2','step3'].forEach((id,i)=>$(id).classList.toggle('active',i===['placing','aiming','locked'].indexOf(mode)));
+    const p=current||(mode==='placing'&&hovered?{...positionForPointer(hovered),heading:null}:null);
+    elements.posX.textContent=p?display(p.x):'—';elements.posY.textContent=p?display(p.y):'—';
+    elements.posH.textContent=current?display(current.heading):'—';
+    const active=!!current;
+    for(const inp of [elements.editX,elements.editY,elements.editH])inp.disabled=!active;
+    if(active){
+      // Avoid overwriting a value while the user is actively editing its input.
+      if(document.activeElement!==elements.editX)elements.editX.value=display(current.x);
+      if(document.activeElement!==elements.editY)elements.editY.value=display(current.y);
+      if(document.activeElement!==elements.editH)elements.editH.value=display(current.heading);
+    } else {
+      elements.editX.value='';elements.editY.value='';elements.editH.value='';
+    }
+    elements.reaim.disabled=!active;elements.copyCoords.disabled=!active;elements.copyJava.disabled=!active;elements.save.disabled=!active;
+    elements.javaPreview.textContent=active?formatJava(current):'new Pose(—, —, Math.toRadians(—))';
+    elements.out.hidden=!active||!footprintOutside(current);
+    elements.pointer.textContent=hovered?`Cursor: ${display(hovered.x)}, ${display(hovered.y)} in`:'144 × 144 in';
+    elements.savedCount.textContent=`${saved.length} ${saved.length===1?'pose':'poses'}`;
+    elements.exportCSV.disabled=!saved.length;elements.exportJSON.disabled=!saved.length;elements.clear.disabled=!saved.length;
+    wrap.classList.toggle('dragging',!!dragging);
+    wrap.classList.toggle('can-drag',mode==='locked'&&!dragging&&!!hovered&&pointInRobot(hovered,current));
+  }
+  function updateAll(){phaseUpdate();draw();}
+  function newPose(){current=null;hovered=null;selected=-1;dragging=null;mode='placing';elements.poseName.value='';updateList();updateAll();}
+  function startAt(pointer){const p=positionForPointer(pointer);current={...p,heading:0};selected=-1;mode='aiming';elements.poseName.value='';updateList();updateAll();}
+  function endHeading(){if(!current)return;mode='locked';updateAll();}
+  function aimAt(pointer){if(mode!=='aiming'||!current)return;current.heading=headingToPointer(current,pointer);updateAll();}
+  function updateList(){
+    elements.list.replaceChildren();
+    if(!saved.length){const empty=document.createElement('p');empty.className='empty';empty.textContent='No saved poses yet. Place a robot, choose its heading, then save.';elements.list.appendChild(empty);return;}
+    saved.forEach((p,i)=>{
+      const li=document.createElement('li');
+      const btn=document.createElement('button');btn.type='button';btn.className='item'+(selected===i?' active':'');btn.title='Select and edit saved pose';
+      const index=document.createElement('span');index.className='index';index.textContent=String(i+1);
+      const details=document.createElement('span');const strong=document.createElement('strong');strong.textContent=p.name;
+      const sub=document.createElement('small');sub.textContent=`(${display(p.x)}, ${display(p.y)}) · ${display(p.heading)}°`;
+      details.append(strong,sub);btn.append(index,details);btn.onclick=()=>{
+        selected=i;current=serializePose(saved[i]);mode='locked';hovered=null;elements.poseName.value=saved[i].name;updateList();updateAll();
+      };
+      const del=document.createElement('button');del.type='button';del.className='small subtle danger';del.textContent='✕';del.title=`Delete ${p.name}`;del.setAttribute('aria-label',`Delete ${p.name}`);
+      del.onclick=()=>{saved.splice(i,1);if(selected===i){selected=-1;current=null;mode='placing';elements.poseName.value='';}else if(selected>i)selected--;persist();updateList();updateAll();};
+      li.append(btn,del);elements.list.appendChild(li);
+    });
+  }
+  function saveCurrent(){
+    if(!current)return;
+    const updating=selected>=0;
+    const i=updating?selected:saved.length;
+    const name=elements.poseName.value.trim()||`Pose ${i+1}`;
+    const p={...serializePose(current),name};
+    if(selected>=0)saved[selected]=p;else {saved.push(p);selected=saved.length-1;}
+    mode='locked';elements.poseName.value=name;persist();updateList();updateAll();toast(updating?'Pose updated':'Pose saved');
+  }
+  function download(filename,content,type){
+    const blob=new Blob([content],{type});const url=URL.createObjectURL(blob);const a=document.createElement('a');
+    a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),3000);
+  }
+  function csvEscape(s){return `"${String(s).replaceAll('"','""')}"`;}
+  async function copyText(content){
+    try{if(!navigator.clipboard?.writeText)throw Error('Clipboard API unavailable');await navigator.clipboard.writeText(content);toast('Copied to clipboard');}
+    catch{
+      const t=document.createElement('textarea');t.value=content;t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.select();
+      let result=false;try{result=document.execCommand('copy');}catch{}t.remove();toast(result?'Copied to clipboard':'Clipboard unavailable; select the code to copy');
+    }
+  }
+  canvas.addEventListener('pointerdown',e=>{
+    if(e.pointerType==='mouse'&&e.button!==0)return;
+    e.preventDefault();activePointer=e.pointerId;
+    try{canvas.setPointerCapture(e.pointerId);}catch{}
+    const p=fromPointer(e);hovered=p;
+    if(mode==='placing')startAt(p);
+    else if(mode==='aiming'){current.heading=headingToPointer(current,p);endHeading();}
+    else if(mode==='locked'&&current){
+      if(pointInRobot(p,current)){dragging={start:p,original:{...current}};}
+      else startAt(p);
+    }
+    updateAll();
+  });
+  canvas.addEventListener('pointermove',e=>{
+    const p=fromPointer(e);hovered=p;
+    if(dragging&&activePointer===e.pointerId&&current){
+      const dx=p.x-dragging.start.x, dy=p.y-dragging.start.y;
+      current.x=round1(clamp(dragging.original.x+dx,HALF,FIELD-HALF));
+      current.y=round1(clamp(dragging.original.y+dy,HALF,FIELD-HALF));
+    } else if(mode==='aiming'){current.heading=headingToPointer(current,p);}
+    updateAll();
+  });
+  function endPointer(e){if(activePointer===e.pointerId){activePointer=null;dragging=null;updateAll();}}
+  canvas.addEventListener('pointerup',endPointer);
+  canvas.addEventListener('pointercancel',endPointer);
+  canvas.addEventListener('pointerleave',()=>{if(activePointer===null){hovered=null;updateAll();}});
+  elements.theme.addEventListener('change',()=>{persist();loadImage();});
+  elements.grid.addEventListener('change',()=>{persist();draw();});
+  $('loadImage').addEventListener('click',()=>$('fileUpload').click());
+  $('fileUpload').addEventListener('change',e=>{
+    const file=e.target.files?.[0];if(!file)return;
+    const theme=elements.theme.value;
+    if(imageOverrides[theme])URL.revokeObjectURL(imageOverrides[theme]);
+    imageOverrides[theme]=URL.createObjectURL(file);loadImage();toast(`${theme[0].toUpperCase()+theme.slice(1)} field image loaded`);e.target.value='';
+  });
+  $('newPose').addEventListener('click',newPose);
+  elements.reaim.addEventListener('click',()=>{if(!current)return;mode='aiming';updateAll();});
+  for(const [key,inp] of [['x',elements.editX],['y',elements.editY],['heading',elements.editH]]){
+    inp.addEventListener('change',()=>{
+      if(!current)return;const val=Number(inp.value);if(!Number.isFinite(val)){updateAll();return;}
+      current[key]=key==='heading'?normalizeHeading(val):round1(clamp(val,HALF,FIELD-HALF));
+      mode='locked';inp.blur();updateAll();
+    });
+  }
+  elements.copyCoords.addEventListener('click',()=>{if(current)copyText(`${display(current.x)}, ${display(current.y)}, ${display(current.heading)}`);});
+  elements.copyJava.addEventListener('click',()=>{if(current)copyText(formatJava(current));});
+  elements.save.addEventListener('click',saveCurrent);
+  elements.poseName.addEventListener('keydown',e=>{if(e.key==='Enter'&&current){e.preventDefault();saveCurrent();}});
+  elements.exportCSV.addEventListener('click',()=>{
+    const rows=['Name,X (in),Y (in),Heading (deg)',...saved.map(p=>`${csvEscape(p.name)},${display(p.x)},${display(p.y)},${display(p.heading)}`)];
+    download('biobuzz-poses.csv',rows.join('\r\n')+'\r\n','text/csv;charset=utf-8');
+  });
+  elements.exportJSON.addEventListener('click',()=>download('biobuzz-poses.json',JSON.stringify({fieldSizeInches:FIELD,robotSizeInches:ROBOT,headingConvention:'0 down, 90 left, 180 up, 270 right',poses:saved},null,2),'application/json'));
+  elements.clear.addEventListener('click',()=>{
+    if(!confirm(`Clear all ${saved.length} saved poses?`))return;
+    saved=[];selected=-1;current=null;mode='placing';elements.poseName.value='';persist();updateList();updateAll();toast('Saved poses cleared');
+  });
+  window.addEventListener('keydown',e=>{
+    if(e.target instanceof HTMLInputElement||e.target instanceof HTMLSelectElement)return;
+    if(e.key==='Escape')newPose();
+    else if(e.key==='Enter'&&mode==='aiming')endHeading();
+  });
+  restore();updateList();updateAll();loadImage();
+  if('ResizeObserver'in window)new ResizeObserver(resize).observe(wrap);
+  else window.addEventListener('resize',resize);
+  resize();
+})();
+</script>
+</body>
+</html>
